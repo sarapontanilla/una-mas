@@ -384,3 +384,40 @@ const BASE_DE_DATOS = {
 
 // Exponemos la base de datos de forma global para que app.js la use.
 window.BASE_DE_DATOS = BASE_DE_DATOS;
+
+/**
+ * ============================================================
+ *  ORDEN DE JUEGO DE LAS CATEGORÍAS
+ * ============================================================
+ * Este array NO modifica el contenido de BASE_DE_DATOS.
+ * Solo define en qué orden se juegan las categorías de cada
+ * nivel (de la primera a la última). Los nombres deben coincidir
+ * exactamente con el campo "nombre" de cada categoría de arriba.
+ *
+ * Para cambiar el orden en el futuro, simplemente reordena los
+ * nombres dentro de cada nivel.
+ * ============================================================
+ */
+const ORDEN_CATEGORIAS = {
+  nivel1: [
+    "Elige uno",
+    "Minijuegos",
+    "Retos",
+    "Yo nunca",
+    "Quién es más probable"
+  ],
+  nivel2: [
+    "Test de compatibilidad",
+    "Conocerse mejor",
+    "¿Qué harías si...?",
+    "Filosofía",
+    "Dilemas morales"
+  ],
+  nivel3: [
+    "Cómo ve uno al otro",
+    "Preguntas generales sobre relaciones",
+    "Preguntas directas sobre nosotros"
+  ]
+};
+
+window.ORDEN_CATEGORIAS = ORDEN_CATEGORIAS;

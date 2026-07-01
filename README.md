@@ -51,10 +51,18 @@ archivo. El juego mezcla todas las preguntas de un nivel entre sí.
 
 ## Cómo funciona el juego (resumen)
 
-- **3 niveles**, cada uno con sus propias preguntas mezcladas aleatoriamente.
-- Ninguna pregunta se repite durante la partida.
+- **3 niveles**, y cada nivel está dividido en **categorías** que se juegan
+  en un orden fijo (ver más abajo). Dentro de la categoría actual, las
+  preguntas salen en orden aleatorio y nunca se repiten durante la partida.
+- Arriba siempre se ve el **Nivel** y la **Categoría** en la que estás.
 - El turno de quién responde primero se alterna automáticamente en cada pregunta.
 - Las preguntas de "Elige uno" (Nivel 1) piden que respondáis los dos a la vez.
+- Botón **"Siguiente pregunta"**: saca otra pregunta al azar de la misma categoría.
+- Botón **"Siguiente categoría"**: pasa manualmente a la siguiente categoría del
+  nivel. Cuando ya estás en la última categoría del nivel, este mismo botón
+  cambia automáticamente a **"Pasar al nivel N"**.
+- Si se agotan las preguntas de una categoría, la app pasa sola a la siguiente
+  categoría (o muestra la pantalla de fin de nivel si era la última).
 - Cada 10 preguntas respondidas aparece una **Carta Especial** con una pregunta
   libre, alternando el turno entre los dos jugadores.
 - En el **Nivel 3** se activa un sistema de valoración: después de cada
@@ -62,3 +70,18 @@ archivo. El juego mezcla todas las preguntas de un nivel entre sí.
   marcador visible en la parte superior.
 - Los jugadores deciden libremente cuándo pasar de nivel o terminar la partida
   con los botones correspondientes.
+
+### Orden de las categorías
+
+```
+Nivel 1                        Nivel 2                       Nivel 3
+1. Elige uno                   1. Test de compatibilidad     1. Cómo ve uno al otro
+2. Minijuegos                  2. Conocerse mejor             2. Preguntas generales
+3. Retos                       3. ¿Qué harías si...?             sobre relaciones
+4. Yo nunca                    4. Filosofía                  3. Preguntas directas
+5. Quién es más probable       5. Dilemas morales                sobre nosotros
+```
+
+Este orden se define en `preguntas.js`, dentro del objeto `ORDEN_CATEGORIAS`,
+totalmente separado del contenido de las preguntas — así que puedes reordenar
+las categorías sin tocar ni una sola pregunta.

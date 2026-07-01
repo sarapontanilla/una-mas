@@ -3,7 +3,11 @@
  *  CERCA — LÓGICA DE LA APLICACIÓN
  * ============================================================
  * Este archivo controla todo el funcionamiento del juego:
- * - Gestión de niveles y mezcla aleatoria de preguntas.
+ * - Gestión de niveles, categorías y mezcla aleatoria de
+ *   preguntas SOLO dentro de la categoría actual.
+ * - Navegación manual entre categorías (botón "Siguiente
+ *   categoría", que se convierte en "Pasar al siguiente nivel"
+ *   cuando estamos en la última categoría del nivel).
  * - Alternancia de turnos entre los dos jugadores.
  * - Sistema de valoración y puntuación (Nivel 3).
  * - Cartas especiales cada 10 preguntas.
@@ -11,6 +15,9 @@
  *
  * PARA CAMBIAR LOS NOMBRES DE LOS JUGADORES:
  *   Modifica las dos constantes JUGADOR_1 y JUGADOR_2 aquí abajo.
+ *
+ * PARA CAMBIAR EL ORDEN DE LAS CATEGORÍAS:
+ *   Modifica el objeto ORDEN_CATEGORIAS en preguntas.js.
  * ============================================================
  */
 
@@ -26,7 +33,8 @@ const PREGUNTAS_POR_CARTA_ESPECIAL = 10;
 // ---------------------------------------------------------------
 const estado = {
   nivelActual: 1,              // 1, 2 o 3
-  mazos: {},                   // { 1: [preguntas...], 2: [...], 3: [...] } ya mezclados
+  categoriaIndiceActual: 0,    // índice de la categoría actual dentro de ORDEN_CATEGORIAS del nivel
+  mazosPorCategoria: {},       // { 1: [ [preguntasCat1...], [preguntasCat2...], ... ], 2: [...], 3: [...] } ya mezclados por categoría
   preguntaActual: null,        // objeto { texto, tipo }
   turnoInicial: 1,             // qué jugador empieza en la pregunta actual (1 o 2, alterna)
   contadorPreguntasPartida: 0, // total de preguntas respondidas en toda la partida (para cartas especiales)
@@ -49,20 +57,42 @@ function mezclar(array) {
   return copia;
 }
 
-/** Construye y mezcla el mazo de preguntas de un nivel a partir de la base de datos */
-function construirMazo(numeroNivel) {
+/** Nombres de las categorías de un nivel, en el orden de juego definido en preguntas.js */
+function nombresCategorias(numeroNivel) {
+  const clave = `nivel${numeroNivel}`;
+  return (window.ORDEN_CATEGORIAS && window.ORDEN_CATEGORIAS[clave]) || [];
+}
+
+/**
+ * Construye, para un nivel, un array de mazos ya mezclados —uno por
+ * categoría— siguiendo el orden de ORDEN_CATEGORIAS. Cada mazo contiene
+ * únicamente las preguntas de su propia categoría (no se mezclan entre sí).
+ */
+function construirMazosPorCategoria(numeroNivel) {
   const clave = `nivel${numeroNivel}`;
   const nivelData = window.BASE_DE_DATOS[clave];
   if (!nivelData) return [];
 
-  const todas = [];
+  const categoriasPorNombre = {};
   nivelData.categorias.forEach(categoria => {
-    categoria.preguntas.forEach(texto => {
-      todas.push({ texto, tipo: categoria.tipo || "normal" });
-    });
+    categoriasPorNombre[categoria.nombre] = categoria;
   });
 
-  return mezclar(todas);
+  return nombresCategorias(numeroNivel).map(nombre => {
+    const categoria = categoriasPorNombre[nombre];
+    if (!categoria) return { nombre, tipo: "normal", mazo: [] };
+
+    const preguntas = categoria.preguntas.map(texto => ({
+      texto,
+      tipo: categoria.tipo || "normal"
+    }));
+
+    return {
+      nombre: categoria.nombre,
+      tipo: categoria.tipo || "normal",
+      mazo: mezclar(preguntas)
+    };
+  });
 }
 
 /** Nombre del jugador según su número (1 o 2) */
@@ -93,6 +123,7 @@ const el = {
   btnEmpezar: document.getElementById("btn-empezar"),
 
   nivelActualNum: document.getElementById("nivel-actual-num"),
+  categoriaActualNombre: document.getElementById("categoria-actual-nombre"),
   btnMenu: document.getElementById("btn-menu"),
 
   questionCard: document.getElementById("question-card"),
@@ -106,8 +137,8 @@ const el = {
   ratingButtons: document.querySelectorAll(".rating-btn"),
 
   btnSiguientePregunta: document.getElementById("btn-siguiente-pregunta"),
-  btnSiguienteNivel: document.getElementById("btn-siguiente-nivel"),
-  btnSiguienteNivelNum: document.getElementById("btn-siguiente-nivel-num"),
+  btnSiguienteCategoria: document.getElementById("btn-siguiente-categoria"),
+  btnSiguienteCategoriaTexto: document.getElementById("btn-siguiente-categoria-texto"),
   btnTerminar: document.getElementById("btn-terminar"),
 
   specialCardFor: document.getElementById("special-card-for"),
@@ -154,10 +185,11 @@ function mostrarVista(vista) {
 // ---------------------------------------------------------------
 function inicializarPartida() {
   estado.nivelActual = 1;
-  estado.mazos = {
-    1: construirMazo(1),
-    2: construirMazo(2),
-    3: construirMazo(3),
+  estado.categoriaIndiceActual = 0;
+  estado.mazosPorCategoria = {
+    1: construirMazosPorCategoria(1),
+    2: construirMazosPorCategoria(2),
+    3: construirMazosPorCategoria(3),
   };
   estado.turnoInicial = 1;
   estado.contadorPreguntasPartida = 0;
@@ -178,18 +210,62 @@ function empezarPartida() {
 }
 
 // ---------------------------------------------------------------
-// NIVEL — UI y transición
+// NIVEL Y CATEGORÍA — estado derivado y UI
 // ---------------------------------------------------------------
+
+/** Array de mazos (uno por categoría) del nivel actual */
+function mazosDelNivelActual() {
+  return estado.mazosPorCategoria[estado.nivelActual] || [];
+}
+
+/** Objeto { nombre, tipo, mazo } de la categoría en la que estamos ahora mismo */
+function categoriaActual() {
+  return mazosDelNivelActual()[estado.categoriaIndiceActual] || null;
+}
+
+/** ¿Es la categoría actual la última del nivel actual? */
+function esUltimaCategoriaDelNivel() {
+  return estado.categoriaIndiceActual >= mazosDelNivelActual().length - 1;
+}
+
 function actualizarNivelUI() {
   el.nivelActualNum.textContent = estado.nivelActual;
   el.app.dataset.nivel = estado.nivelActual;
 
-  const hayNivelSiguiente = estado.nivelActual < 3;
-  el.btnSiguienteNivel.style.display = hayNivelSiguiente ? "inline-flex" : "none";
-  if (hayNivelSiguiente) {
-    el.btnSiguienteNivelNum.textContent = estado.nivelActual + 1;
+  const categoria = categoriaActual();
+  if (categoria && el.categoriaActualNombre) {
+    el.categoriaActualNombre.textContent = categoria.nombre;
   }
+
+  actualizarBotonSiguienteCategoria();
+
+  const hayNivelSiguiente = estado.nivelActual < 3;
   el.btnMenuSiguienteNivel.style.display = hayNivelSiguiente ? "inline-flex" : "none";
+}
+
+/**
+ * El botón dinámico de la pantalla de juego muestra "Siguiente categoría"
+ * mientras queden más categorías en el nivel, y se convierte en
+ * "Pasar al siguiente nivel" cuando estamos en la última categoría.
+ * En el último nivel y última categoría, se oculta (ya no hay a dónde ir
+ * manualmente; el fin llegará solo cuando se acaben las preguntas).
+ */
+function actualizarBotonSiguienteCategoria() {
+  if (!el.btnSiguienteCategoria) return;
+
+  const esUltima = esUltimaCategoriaDelNivel();
+  const hayNivelSiguiente = estado.nivelActual < 3;
+
+  if (esUltima && !hayNivelSiguiente) {
+    // Última categoría del último nivel: no hay más sitio al que avanzar manualmente.
+    el.btnSiguienteCategoria.style.display = "none";
+    return;
+  }
+
+  el.btnSiguienteCategoria.style.display = "inline-flex";
+  el.btnSiguienteCategoriaTexto.textContent = esUltima
+    ? `Pasar al nivel ${estado.nivelActual + 1}`
+    : "Siguiente categoría";
 }
 
 function actualizarMarcadorUI() {
@@ -201,6 +277,7 @@ function actualizarMarcadorUI() {
 
 function irANivel(numero) {
   estado.nivelActual = numero;
+  estado.categoriaIndiceActual = 0;
   estado.turnoInicial = 1; // cada nivel reinicia quién empieza, por claridad
   actualizarNivelUI();
   actualizarMarcadorUI();
@@ -208,22 +285,56 @@ function irANivel(numero) {
   siguientePregunta();
 }
 
+/**
+ * Avanza manualmente a la siguiente categoría del nivel actual.
+ * Si ya estábamos en la última categoría, en vez de eso pasa al
+ * siguiente nivel (mismo comportamiento que el botón de fin de nivel).
+ */
+function irASiguienteCategoria() {
+  if (esUltimaCategoriaDelNivel()) {
+    if (estado.nivelActual < 3) {
+      irANivel(estado.nivelActual + 1);
+    }
+    return;
+  }
+
+  estado.categoriaIndiceActual += 1;
+  actualizarNivelUI();
+  siguientePregunta();
+}
+
 // ---------------------------------------------------------------
 // PREGUNTAS — obtención y renderizado
 // ---------------------------------------------------------------
-function quedanPreguntas(nivel) {
-  return estado.mazos[nivel] && estado.mazos[nivel].length > 0;
+
+/** ¿Quedan preguntas sin usar en la categoría actual? */
+function quedanPreguntasEnCategoriaActual() {
+  const categoria = categoriaActual();
+  return !!categoria && categoria.mazo.length > 0;
 }
 
+/**
+ * Saca la siguiente pregunta de la categoría actual.
+ * Si la categoría actual ya no tiene preguntas:
+ *   - si hay más categorías en el nivel, pasa automáticamente
+ *     a la siguiente y saca una pregunta de ahí.
+ *   - si era la última categoría del nivel, muestra la pantalla
+ *     de fin de nivel (igual que antes).
+ */
 function siguientePregunta() {
-  const mazo = estado.mazos[estado.nivelActual];
-
-  if (!mazo || mazo.length === 0) {
+  if (!quedanPreguntasEnCategoriaActual()) {
+    if (!esUltimaCategoriaDelNivel()) {
+      estado.categoriaIndiceActual += 1;
+      actualizarNivelUI();
+      siguientePregunta();
+      return;
+    }
     mostrarFinDeNivel();
     return;
   }
 
-  estado.preguntaActual = mazo.pop();
+  const categoria = categoriaActual();
+  estado.preguntaActual = categoria.mazo.pop();
   renderizarPregunta();
 }
 
@@ -391,9 +502,7 @@ el.btnEmpezar.addEventListener("click", empezarPartida);
 
 el.btnSiguientePregunta.addEventListener("click", avanzarPregunta);
 
-el.btnSiguienteNivel.addEventListener("click", () => {
-  if (estado.nivelActual < 3) irANivel(estado.nivelActual + 1);
-});
+el.btnSiguienteCategoria.addEventListener("click", irASiguienteCategoria);
 
 el.btnTerminar.addEventListener("click", terminarPartida);
 

@@ -415,6 +415,19 @@ button {
   font-weight: 700;
   color: var(--color-coral-dark);
 }
+.level-indicator-separator {
+  color: var(--color-border);
+  font-size: 13px;
+}
+.level-indicator-category {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
+}
 
 /* --- Escenario de la tarjeta --- */
 .card-stage {

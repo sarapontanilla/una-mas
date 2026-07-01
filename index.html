@@ -77,6 +77,8 @@
       <div class="level-indicator">
         <span class="level-indicator-label">Nivel</span>
         <span class="level-indicator-number" id="nivel-actual-num">1</span>
+        <span class="level-indicator-separator">·</span>
+        <span class="level-indicator-category" id="categoria-actual-nombre">Elige uno</span>
       </div>
       <button class="icon-btn" id="btn-menu" aria-label="Opciones de partida">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
@@ -132,8 +134,8 @@
         Siguiente pregunta
       </button>
       <div class="game-controls-row">
-        <button class="btn btn--ghost" id="btn-siguiente-nivel">
-          Pasar al nivel <span id="btn-siguiente-nivel-num">2</span>
+        <button class="btn btn--ghost" id="btn-siguiente-categoria">
+          <span id="btn-siguiente-categoria-texto">Siguiente categoría</span>
         </button>
         <button class="btn btn--ghost btn--danger" id="btn-terminar">
           Terminar partida
