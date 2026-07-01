@@ -131,8 +131,7 @@ blanco/negro para texto), siguiendo siempre una de estas combinaciones:
 Nunca se mezclan tres o más colores de marca en la misma pantalla:
 
 - **Portada y pantallas de fin** → fondo Amarillo, acento Lila
-- **Pantalla de juego (Niveles 1 y 2)** → fondo Rosa, acento Naranja
-- **Pantalla de juego (Nivel 3)** → fondo Lila, acento Naranja
+- **Todas las pantallas de juego (Niveles 1, 2 y 3)** → fondo Lila, acento Naranja
 - **Carta especial** → fondo Naranja sólido (color único, sin pareja)
 
 Tipografía: **Plus Jakarta Sans** (sans-serif) en toda la aplicación, sin

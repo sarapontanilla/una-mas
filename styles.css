@@ -17,8 +17,8 @@
    de marca como acento — nunca los cuatro a la vez, y nunca mezclando
    las parejas prohibidas (Rosa+Lila, Naranja+Amarillo):
      · Portada / cierre de partida → fondo Amarillo, acento Lila
-     · Pantalla de juego (Niv 1-2) → fondo Rosa,     acento Naranja
-     · Pantalla de juego (Nivel 3) → fondo Lila,     acento Naranja
+     · Todas las pantallas de juego (Niveles 1, 2 y 3) → fondo Lila,
+       acento Naranja
      · Carta especial              → fondo Naranja (color único, sin pareja)
 
    Tipografía: una única sans-serif moderna (Plus Jakarta Sans) en
@@ -214,15 +214,12 @@ button {
 }
 
 .portada-eyebrow {
-  display: inline-block;
+  display: block;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--negro);
-  background: var(--lila);
-  padding: 7px 16px;
-  border-radius: var(--radius-pill);
   margin-bottom: 20px;
 }
 
@@ -357,18 +354,14 @@ button {
 }
 
 /* ==============================================================
-   PANTALLA DE JUEGO — fondo Rosa, acento Naranja
-   (Nivel 3: fondo Lila, acento Naranja — ver override más abajo)
+   PANTALLA DE JUEGO — fondo Lila (todos los niveles), acento Naranja
 ============================================================== */
 #view-juego {
   padding: 10px 22px 24px;
   justify-content: space-between;
-  background: var(--rosa);
+  background: var(--lila);
   --acento: var(--naranja);
   --acento-texto: var(--blanco);
-}
-[data-nivel="3"] #view-juego {
-  background: var(--lila);
 }
 
 .game-topbar {
@@ -453,8 +446,8 @@ button {
 }
 
 /* --- Indicador de turno: única indicación de la dinámica de la
-   pregunta (responde X / respondéis los dos a la vez). Siempre en
-   Naranja + Blanco, el acento común a Nivel 1-2 y Nivel 3. --- */
+   pregunta (responde X / respondéis los dos a la vez). Etiqueta con
+   fondo Lila y texto Naranja, sin bordes ni sombras. --- */
 .turn-indicator {
   display: flex;
   align-items: center;
@@ -464,10 +457,10 @@ button {
 .turn-text {
   font-size: 13px;
   font-weight: 800;
-  color: var(--blanco);
+  color: var(--naranja);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: var(--naranja);
+  background: var(--lila);
   padding: 8px 18px;
   border-radius: var(--radius-pill);
 }
