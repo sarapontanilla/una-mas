@@ -1,6 +1,6 @@
 /**
  * ============================================================
- *  CERCA — LÓGICA DE LA APLICACIÓN
+ *  UNA MÁS — LÓGICA DE LA APLICACIÓN
  * ============================================================
  * Este archivo controla todo el funcionamiento del juego:
  * - Gestión de niveles, categorías y mezcla aleatoria de
@@ -9,12 +9,15 @@
  *   categoría", que se convierte en "Pasar al siguiente nivel"
  *   cuando estamos en la última categoría del nivel).
  * - Alternancia de turnos entre los dos jugadores.
- * - Sistema de valoración y puntuación (Nivel 3).
- * - Cartas especiales cada 10 preguntas.
+ * - Sistema de doble valoración y puntuación (Nivel 3): cada
+ *   pregunta se responde y valora dos veces (una por jugador)
+ *   antes de pasar a la siguiente pregunta.
+ * - Cartas especiales cada 20 preguntas.
  * - Navegación entre pantallas ("vistas").
  *
  * PARA CAMBIAR LOS NOMBRES DE LOS JUGADORES:
  *   Modifica las dos constantes JUGADOR_1 y JUGADOR_2 aquí abajo.
+ *   Se mostrarán siempre en mayúsculas automáticamente.
  *
  * PARA CAMBIAR EL ORDEN DE LAS CATEGORÍAS:
  *   Modifica el objeto ORDEN_CATEGORIAS en preguntas.js.
@@ -26,7 +29,7 @@
 // ---------------------------------------------------------------
 const JUGADOR_1 = "Sara";
 const JUGADOR_2 = "David";
-const PREGUNTAS_POR_CARTA_ESPECIAL = 10;
+const PREGUNTAS_POR_CARTA_ESPECIAL = 20;
 
 // ---------------------------------------------------------------
 // ESTADO DE LA PARTIDA
@@ -41,6 +44,12 @@ const estado = {
   turnoCartaEspecial: 1,       // a quién le toca la próxima carta especial (alterna)
   puntuaciones: { 1: 0, 2: 0 },
   nivelesConValoracion: [3],   // en qué niveles se activa la valoración
+
+  // --- Flujo de doble valoración del Nivel 3 ---
+  // fase: "responder_1" | "valorar_1" | "responder_2" | "valorar_2"
+  // jugadorQueResponde: 1 o 2 — quién está respondiendo en la fase actual
+  fase: "responder_1",
+  jugadorQueResponde: 1,
 };
 
 // ---------------------------------------------------------------
@@ -95,9 +104,9 @@ function construirMazosPorCategoria(numeroNivel) {
   });
 }
 
-/** Nombre del jugador según su número (1 o 2) */
+/** Nombre del jugador según su número (1 o 2), siempre en MAYÚSCULAS */
 function nombreJugador(numero) {
-  return numero === 1 ? JUGADOR_1 : JUGADOR_2;
+  return (numero === 1 ? JUGADOR_1 : JUGADOR_2).toUpperCase();
 }
 
 // ---------------------------------------------------------------
@@ -127,7 +136,6 @@ const el = {
   btnMenu: document.getElementById("btn-menu"),
 
   questionCard: document.getElementById("question-card"),
-  turnCompass: document.getElementById("turn-compass"),
   turnText: document.getElementById("turn-text"),
   eligeUnoTag: document.getElementById("elige-uno-tag"),
   questionText: document.getElementById("question-text"),
@@ -196,10 +204,10 @@ function inicializarPartida() {
   estado.turnoCartaEspecial = 1;
   estado.puntuaciones = { 1: 0, 2: 0 };
 
-  el.portadaNombre1.textContent = JUGADOR_1;
-  el.portadaNombre2.textContent = JUGADOR_2;
-  el.scoreName1.textContent = JUGADOR_1;
-  el.scoreName2.textContent = JUGADOR_2;
+  el.portadaNombre1.textContent = nombreJugador(1);
+  el.portadaNombre2.textContent = nombreJugador(2);
+  el.scoreName1.textContent = nombreJugador(1);
+  el.scoreName2.textContent = nombreJugador(2);
 }
 
 function empezarPartida() {
@@ -338,28 +346,44 @@ function siguientePregunta() {
   renderizarPregunta();
 }
 
+/** ¿El nivel actual usa el sistema de valoración? */
+function nivelConValoracion() {
+  return estado.nivelesConValoracion.includes(estado.nivelActual);
+}
+
+/**
+ * Pinta la pregunta actual desde cero: se llama una única vez por
+ * pregunta (no en cada cambio de fase). Fija quién responde primero,
+ * arranca siempre en fase "responder_1" y oculta la valoración.
+ */
 function renderizarPregunta() {
   const pregunta = estado.preguntaActual;
   const esEligeUno = pregunta.tipo === "elige_uno";
 
-  // Texto de la pregunta
   el.questionText.textContent = pregunta.texto;
 
-  // Indicador de turno
   if (esEligeUno) {
-    el.turnCompass.dataset.turno = "ambos";
-    el.turnText.textContent = "Respondéis los dos a la vez";
     el.eligeUnoTag.classList.add("is-visible");
   } else {
-    el.turnCompass.dataset.turno = String(estado.turnoInicial);
-    el.turnText.textContent = `Responde primero ${nombreJugador(estado.turnoInicial)}`;
     el.eligeUnoTag.classList.remove("is-visible");
   }
 
-  // Valoración: solo en niveles configurados, y no para "elige uno"
-  const activarValoracion = estado.nivelesConValoracion.includes(estado.nivelActual) && !esEligeUno;
-  el.ratingBox.classList.toggle("is-hidden", !activarValoracion);
+  if (nivelConValoracion() && !esEligeUno) {
+    // Nivel 3: arrancamos el flujo de doble respuesta + doble valoración.
+    estado.fase = "responder_1";
+    estado.jugadorQueResponde = estado.turnoInicial;
+    estado.valoracionYaAplicada = null;
+  } else {
+    // Resto de niveles: comportamiento de siempre, sin fases.
+    estado.fase = null;
+    estado.jugadorQueResponde = null;
+    estado.valoracionYaAplicada = null;
+  }
+
+  actualizarTurnoUI();
   limpiarSeleccionValoracion();
+  el.ratingBox.classList.add("is-hidden");
+  actualizarTextoBotonPrincipal();
 
   // Micro-animación de entrada de la tarjeta
   el.questionCard.classList.remove("card--enter");
@@ -370,6 +394,32 @@ function renderizarPregunta() {
   estado.turnoInicial = estado.turnoInicial === 1 ? 2 : 1;
 }
 
+/**
+ * Actualiza el texto que indica quién responde ahora mismo, según
+ * la fase en la que estemos (solo relevante con fases en Nivel 3;
+ * en el resto de niveles simplemente indica quién responde primero).
+ */
+function actualizarTurnoUI() {
+  const pregunta = estado.preguntaActual;
+  const esEligeUno = pregunta.tipo === "elige_uno";
+
+  if (esEligeUno) {
+    el.turnText.textContent = "Respondéis los dos a la vez";
+    return;
+  }
+
+  if (estado.fase === "responder_1") {
+    el.turnText.textContent = `Responde ${nombreJugador(estado.jugadorQueResponde)}`;
+  } else if (estado.fase === "valorar_1" || estado.fase === "valorar_2") {
+    el.turnText.textContent = `${nombreJugador(estado.jugadorQueResponde)} ha respondido`;
+  } else if (estado.fase === "responder_2") {
+    el.turnText.textContent = `Ahora responde ${nombreJugador(estado.jugadorQueResponde)}`;
+  } else {
+    // Niveles sin fases: mantenemos el texto original "Responde primero X"
+    el.turnText.textContent = `Responde primero ${nombreJugador(estado.jugadorQueResponde ?? estado.turnoInicial)}`;
+  }
+}
+
 function limpiarSeleccionValoracion() {
   el.ratingButtons.forEach(btn => btn.classList.remove("is-selected"));
 }
@@ -377,29 +427,130 @@ function limpiarSeleccionValoracion() {
 // ---------------------------------------------------------------
 // VALORACIÓN (Nivel 3)
 // ---------------------------------------------------------------
+
+/**
+ * Aplica la puntuación elegida al jugador que acaba de responder
+ * en la fase de valoración actual ("valorar_1" valora a quien
+ * respondió en "responder_1", y "valorar_2" a quien respondió en
+ * "responder_2"). Guarda que ya hay una valoración elegida, para
+ * poder confirmar con el botón principal.
+ */
 function manejarValoracion(puntos, boton) {
+  // Si ya había una valoración elegida para esta fase, deshacemos su
+  // puntuación antes de aplicar la nueva (por si el jugador cambia de opinión).
+  if (estado.valoracionYaAplicada) {
+    estado.puntuaciones[estado.jugadorQueResponde] -= estado.valoracionYaAplicada;
+  }
+
   limpiarSeleccionValoracion();
   boton.classList.add("is-selected");
 
-  // Se suma la puntuación al jugador que ACABA de responder,
-  // es decir, el que respondió en segundo lugar en esta pregunta.
-  // Como turnoInicial ya se alternó al renderizar, el que respondió
-  // segundo en la pregunta actual es el turno que quedó "actual" antes de alternar.
-  const jugadorValorado = estado.ultimoJugadorEnResponder;
-  if (jugadorValorado) {
-    estado.puntuaciones[jugadorValorado] += puntos;
-    const valueEl = jugadorValorado === 1 ? el.scoreValue1 : el.scoreValue2;
-    valueEl.textContent = estado.puntuaciones[jugadorValorado];
-    valueEl.classList.remove("bump");
-    void valueEl.offsetWidth;
-    valueEl.classList.add("bump");
+  const jugadorValorado = estado.jugadorQueResponde;
+  estado.puntuaciones[jugadorValorado] += puntos;
+  estado.valoracionYaAplicada = puntos;
+
+  const valueEl = jugadorValorado === 1 ? el.scoreValue1 : el.scoreValue2;
+  valueEl.textContent = estado.puntuaciones[jugadorValorado];
+  valueEl.classList.remove("bump");
+  void valueEl.offsetWidth;
+  valueEl.classList.add("bump");
+
+  actualizarTextoBotonPrincipal();
+}
+
+/**
+ * Texto y estado (habilitado/deshabilitado) del botón principal según
+ * la fase actual. Fuera del flujo de valoración (niveles 1 y 2, o
+ * preguntas "elige uno") siempre dice "Siguiente pregunta" y está activo.
+ */
+function actualizarTextoBotonPrincipal() {
+  if (estado.fase === "responder_1" || estado.fase === "responder_2") {
+    el.btnSiguientePregunta.textContent = `${nombreJugador(estado.jugadorQueResponde)} ha respondido`;
+    el.btnSiguientePregunta.disabled = false;
+  } else if (estado.fase === "valorar_1" || estado.fase === "valorar_2") {
+    el.btnSiguientePregunta.textContent = "Confirmar valoración";
+    el.btnSiguientePregunta.disabled = !estado.valoracionYaAplicada;
+  } else {
+    el.btnSiguientePregunta.textContent = "Siguiente pregunta";
+    el.btnSiguientePregunta.disabled = false;
   }
 }
 
+/**
+ * Avanza de fase dentro de la misma pregunta del Nivel 3:
+ * responder_1 -> valorar_1 -> responder_2 -> valorar_2 -> (pregunta siguiente)
+ */
+function avanzarFaseNivel3() {
+  if (estado.fase === "responder_1") {
+    estado.fase = "valorar_1";
+    estado.valoracionYaAplicada = null;
+    // Quien valora es el otro jugador (el que aún no ha respondido en esta pregunta)
+    el.ratingLabel.textContent = `${nombreJugador(otroJugador(estado.jugadorQueResponde))} valora la respuesta de ${nombreJugador(estado.jugadorQueResponde)}`;
+    el.ratingBox.classList.remove("is-hidden");
+    limpiarSeleccionValoracion();
+    actualizarTurnoUI();
+    actualizarTextoBotonPrincipal();
+    return;
+  }
+
+  if (estado.fase === "valorar_1") {
+    if (!estado.valoracionYaAplicada) return; // no se puede confirmar sin elegir una opción
+    estado.fase = "responder_2";
+    estado.jugadorQueResponde = otroJugador(estado.jugadorQueResponde);
+    el.ratingBox.classList.add("is-hidden");
+    actualizarTurnoUI();
+    actualizarTextoBotonPrincipal();
+    return;
+  }
+
+  if (estado.fase === "responder_2") {
+    estado.fase = "valorar_2";
+    estado.valoracionYaAplicada = null;
+    el.ratingLabel.textContent = `${nombreJugador(otroJugador(estado.jugadorQueResponde))} valora la respuesta de ${nombreJugador(estado.jugadorQueResponde)}`;
+    el.ratingBox.classList.remove("is-hidden");
+    limpiarSeleccionValoracion();
+    actualizarTurnoUI();
+    actualizarTextoBotonPrincipal();
+    return;
+  }
+
+  if (estado.fase === "valorar_2") {
+    if (!estado.valoracionYaAplicada) return; // no se puede confirmar sin elegir una opción
+    // Ambos jugadores ya respondieron y fueron valorados: pasamos a la pregunta siguiente de verdad.
+    estado.fase = null;
+    estado.jugadorQueResponde = null;
+    estado.valoracionYaAplicada = null;
+    continuarConSiguientePreguntaReal();
+    return;
+  }
+}
+
+/** Devuelve el número del jugador contrario (1<->2) */
+function otroJugador(numero) {
+  return numero === 1 ? 2 : 1;
+}
+
 // ---------------------------------------------------------------
-// AVANZAR PREGUNTA (botón "Siguiente pregunta")
+// AVANZAR PREGUNTA (botón "Siguiente pregunta" / "Confirmar valoración")
 // ---------------------------------------------------------------
 function avanzarPregunta() {
+  // Si estamos dentro del flujo de fases del Nivel 3, el botón avanza
+  // de fase en vez de saltar directamente a la siguiente pregunta.
+  if (estado.fase) {
+    avanzarFaseNivel3();
+    return;
+  }
+
+  continuarConSiguientePreguntaReal();
+}
+
+/**
+ * Lógica original de "pasar a la siguiente pregunta real": cuenta la
+ * pregunta para la carta especial y decide si toca carta especial o
+ * directamente la siguiente pregunta. Se usa tanto para niveles sin
+ * fases como al terminar el flujo completo de valoración del Nivel 3.
+ */
+function continuarConSiguientePreguntaReal() {
   estado.contadorPreguntasPartida += 1;
 
   const tocaCartaEspecial =
@@ -462,8 +613,8 @@ function terminarPartida() {
 
   el.finalScores.classList.toggle("is-hidden", !huboValoracion);
   if (huboValoracion) {
-    el.finalNombre1.textContent = JUGADOR_1;
-    el.finalNombre2.textContent = JUGADOR_2;
+    el.finalNombre1.textContent = nombreJugador(1);
+    el.finalNombre2.textContent = nombreJugador(2);
     el.finalPuntos1.textContent = estado.puntuaciones[1];
     el.finalPuntos2.textContent = estado.puntuaciones[2];
   }
@@ -481,19 +632,6 @@ function abrirMenu() {
 function cerrarMenu() {
   el.menuBackdrop.classList.add("is-hidden");
 }
-
-// ---------------------------------------------------------------
-// SEGUIMIENTO DE "QUIÉN RESPONDIÓ SEGUNDO" (para la valoración)
-// ---------------------------------------------------------------
-// Nota: turnoInicial se alterna dentro de renderizarPregunta() justo
-// después de fijar quién empieza. Por tanto, antes de alternar,
-// guardamos quién fue el segundo en responder (el que no empezó).
-const _renderizarPreguntaOriginal = renderizarPregunta;
-renderizarPregunta = function () {
-  const empezo = estado.turnoInicial;
-  _renderizarPreguntaOriginal();
-  estado.ultimoJugadorEnResponder = empezo === 1 ? 2 : 1;
-};
 
 // ---------------------------------------------------------------
 // EVENTOS

@@ -1,53 +1,61 @@
 /* ==============================================================
-   CERCA — HOJA DE ESTILOS
+   UNA MÁS — HOJA DE ESTILOS
    ==============================================================
    Sistema de diseño:
-   - Paleta cálida "sobremesa": crema, terracota, ciruela y oro,
-     pensada para sentirse como una cita agradable, no como una
-     app corporativa.
-   - Tipografía: Fraunces (display, con personalidad, itálica en
-     los momentos emocionales) + Manrope (texto, muy legible).
-   - Elemento de firma: la "brújula de turno", una aguja que
-     apunta físicamente hacia quién debe responder — referencia
-     directa al gesto de pasarse el móvil de mano en mano.
+   - Paleta plana y editorial: naranja, rosa, lila y amarillo claro.
+     Cada pantalla usa como máximo una pareja de color dominante,
+     nunca los cuatro colores a la vez:
+       · Portada / cierre de partida  → Lila + Amarillo claro
+       · Pantalla de juego            → Rosa + Naranja
+       · Nivel 3                      → Naranja + Lila
+       · Carta especial               → Naranja sólido
+     Sin degradados en ningún sitio: todo son colores planos.
+   - Tipografía: una única sans-serif moderna (Plus Jakarta Sans)
+     para toda la aplicación, sin serif en ningún punto.
+   - Mucho aire: espaciados generosos, jerarquía clara, sin sombras
+     exageradas ni efectos llamativos — sensación de producto de
+     diseño, no de juego casual.
 ============================================================== */
 
 :root {
-  /* --- Paleta --- */
-  --color-bg:          #FBF3EC;   /* crema cálido de fondo */
-  --color-bg-soft:     #F4E6D8;   /* crema más oscuro para tarjetas secundarias */
-  --color-ink:         #2E2019;   /* texto principal, marrón casi negro */
-  --color-ink-soft:     #6B5A50;  /* texto secundario */
-  --color-coral:       #E2694F;   /* acento principal — coral/terracota */
-  --color-coral-dark:  #C6512E;
-  --color-plum:        #6B3B4C;   /* acento secundario — ciruela, para nivel 3 */
-  --color-gold:        #CC9A3E;   /* acento estrella / valoración */
-  --color-card:        #FFFDFA;   /* blanco cálido de tarjeta */
-  --color-border:      #E9D9C7;
+  /* --- Paleta de marca (usar solo estas 4 + neutros) --- */
+  --naranja:      #EB4213;
+  --rosa:         #FF99DC;
+  --lila:         #BCACCE;
+  --amarillo:     #FFFDB4;
 
-  /* --- Tipografía --- */
-  --font-display: 'Fraunces', Georgia, serif;
-  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+  /* --- Neutros editoriales --- */
+  --tinta:        #1C1712;   /* texto principal, casi negro */
+  --tinta-suave:  #6B6459;   /* texto secundario */
+  --papel:        #FFFFFF;   /* blanco de tarjeta */
+  --hueso:        #FAF8F2;   /* fondo neutro cálido, base de la app */
+  --borde:        #EAE4D8;
+
+  /* --- Colores funcionales derivados de la paleta de marca --- */
+  --lila-suave:   #E9E3F0;   /* lila muy claro, para fondos */
+  --lila-oscuro:  #8C79A6;   /* lila para texto sobre amarillo */
+  --naranja-oscuro: #C23A10;
+  --rosa-suave:   #FFE3F4;
+
+  /* --- Tipografía: una sola familia sans-serif --- */
+  --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   /* --- Forma --- */
-  --radius-lg: 28px;
-  --radius-md: 20px;
-  --radius-sm: 14px;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
   --radius-pill: 999px;
 
-  /* --- Sombra --- */
-  --shadow-card: 0 20px 45px -20px rgba(46, 32, 25, 0.28), 0 2px 8px rgba(46, 32, 25, 0.06);
-  --shadow-soft: 0 8px 24px -12px rgba(46, 32, 25, 0.18);
+  /* --- Sombra: mínima, solo para separar planos, nunca dramática --- */
+  --shadow-card: 0 1px 2px rgba(28, 23, 18, 0.04), 0 8px 24px rgba(28, 23, 18, 0.06);
+  --shadow-soft: 0 1px 2px rgba(28, 23, 18, 0.05);
 
   color-scheme: light;
 }
 
-/* Cuando estamos en Nivel 3, la app cambia sutilmente de tono
-   hacia la ciruela para marcar que "esto va más en serio" */
-[data-nivel="3"] {
-  --color-coral: #6B3B4C;
-  --color-coral-dark: #532A38;
-}
+/* Nivel 3 cambia de pareja cromática: Naranja + Lila en vez de Rosa + Naranja.
+   El cambio se aplica directamente en los selectores [data-nivel="3"] ... más
+   abajo (p. ej. el fondo del texto de turno). */
 
 * { box-sizing: border-box; }
 
@@ -59,12 +67,13 @@ html, body {
 }
 
 body {
-  font-family: var(--font-body);
-  background: var(--color-bg);
-  color: var(--color-ink);
+  font-family: var(--font);
+  background: var(--hueso);
+  color: var(--tinta);
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 button {
@@ -96,36 +105,11 @@ button {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   overflow: hidden;
-}
-
-/* Fondo ambiental: manchas de color muy suaves */
-.ambient {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.ambient-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.35;
-}
-.ambient-blob--1 {
-  width: 320px; height: 320px;
-  background: #F4B79B;
-  top: -120px; right: -100px;
-}
-.ambient-blob--2 {
-  width: 280px; height: 280px;
-  background: #E8CBA8;
-  bottom: -100px; left: -90px;
+  background: var(--hueso);
 }
 
 /* ==============================================================
    VISTAS (pantallas)
-   Cada .view ocupa toda la app; se muestra/oculta con clases.
 ============================================================== */
 .view {
   position: absolute;
@@ -136,6 +120,7 @@ button {
   flex-direction: column;
   z-index: 1;
   opacity: 0;
+  background: var(--hueso);
 }
 
 .view.view--active {
@@ -144,119 +129,123 @@ button {
 }
 
 .view.view--entering {
-  animation: viewIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: viewIn 0.36s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 .view.view--leaving {
-  animation: viewOut 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+  animation: viewOut 0.24s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 @keyframes viewIn {
-  from { opacity: 0; transform: translateY(14px) scale(0.99); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes viewOut {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(-10px) scale(0.99); }
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-8px); }
 }
 
 /* ==============================================================
-   MARCADOR (scoreboard) — solo Nivel 3
+   MARCADOR (scoreboard) — solo Nivel 3, vive dentro de #view-juego
 ============================================================== */
 .scoreboard {
-  position: relative;
-  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 14px 20px 4px;
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  gap: 8px;
+  padding: 14px 22px 0;
+  transition: opacity 0.25s ease, max-height 0.25s ease, padding 0.25s ease;
+  max-height: 60px;
+  overflow: hidden;
 }
 .scoreboard.is-hidden {
   opacity: 0;
-  transform: translateY(-8px);
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
   pointer-events: none;
-  height: 0;
-  padding: 0;
-  overflow: hidden;
 }
 .score-pill {
   display: flex;
   align-items: baseline;
-  gap: 6px;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  padding: 6px 14px;
+  gap: 7px;
+  background: var(--lila-suave);
+  padding: 7px 16px;
   border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-soft);
 }
 .score-name {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-ink-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--lila-oscuro);
 }
 .score-value {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--color-coral-dark);
-  transition: transform 0.25s ease;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--naranja);
+  transition: transform 0.2s ease;
 }
 .score-value.bump {
   animation: scoreBump 0.4s ease;
 }
 @keyframes scoreBump {
   0% { transform: scale(1); }
-  40% { transform: scale(1.35); color: var(--color-gold); }
+  40% { transform: scale(1.3); }
   100% { transform: scale(1); }
 }
 .score-divider {
-  color: var(--color-ink-soft);
-  opacity: 0.5;
-  font-size: 14px;
+  color: var(--tinta-suave);
+  opacity: 0.4;
+  font-size: 13px;
 }
 
 /* ==============================================================
-   PORTADA
+   PORTADA — pareja Lila + Amarillo claro
 ============================================================== */
 #view-portada {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 32px 28px;
+  padding: 40px 32px;
+  background: var(--amarillo);
+  --acento: var(--lila-oscuro);
+  --acento-oscuro: #6E5D89;
 }
 
 .portada-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 0;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .portada-eyebrow {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-coral-dark);
-  margin-bottom: 10px;
+  color: var(--lila-oscuro);
+  margin-bottom: 18px;
 }
 
 .portada-title {
-  font-family: var(--font-display);
-  font-weight: 600;
-  font-size: 68px;
-  line-height: 0.95;
+  font-family: var(--font);
+  font-weight: 800;
+  font-size: 56px;
+  line-height: 1;
+  letter-spacing: 0.02em;
   margin: 0;
-  color: var(--color-ink);
+  color: var(--tinta);
 }
 
 .portada-subtitle {
   font-size: 16px;
-  color: var(--color-ink-soft);
-  max-width: 300px;
-  margin: 14px 0 30px;
+  font-weight: 500;
+  color: var(--tinta-suave);
+  max-width: 280px;
+  margin: 18px 0 36px;
   line-height: 1.5;
 }
 
@@ -264,40 +253,40 @@ button {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 40px;
+  margin-bottom: 44px;
 }
 
 .player-chip {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  padding: 10px 18px;
+  background: var(--papel);
+  padding: 10px 20px;
   border-radius: var(--radius-pill);
-  font-weight: 600;
-  font-size: 15px;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.03em;
   box-shadow: var(--shadow-soft);
 }
 .player-dot {
-  width: 8px; height: 8px;
+  width: 7px; height: 7px;
   border-radius: 50%;
 }
-.player-chip--a .player-dot { background: var(--color-coral); }
-.player-chip--b .player-dot { background: var(--color-plum); }
+.player-chip--a .player-dot { background: var(--tinta); }
+.player-chip--b .player-dot { background: var(--lila-oscuro); }
 
 .portada-players-and {
-  font-family: var(--font-display);
-  font-style: italic;
-  color: var(--color-ink-soft);
-  font-size: 18px;
+  font-weight: 600;
+  color: var(--tinta-suave);
+  font-size: 15px;
 }
 
 .portada-hint {
-  margin-top: 20px;
-  font-size: 13px;
-  color: var(--color-ink-soft);
-  opacity: 0.75;
+  margin-top: 22px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lila-oscuro);
+  opacity: 0.8;
 }
 
 /* ==============================================================
@@ -307,50 +296,55 @@ button {
   border: none;
   cursor: pointer;
   font-weight: 700;
+  font-family: var(--font);
   border-radius: var(--radius-pill);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
 }
 .btn:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn--large {
   width: 100%;
   padding: 18px 24px;
-  font-size: 17px;
+  font-size: 16px;
 }
 
 .btn--primary {
-  background: var(--color-coral);
-  color: #FFF8F3;
-  box-shadow: 0 14px 28px -12px rgba(198, 81, 46, 0.55);
+  background: var(--acento, var(--naranja));
+  color: var(--papel);
 }
-.btn--primary:hover {
-  background: var(--color-coral-dark);
+.btn--primary:active:not(:disabled) {
+  background: var(--acento-oscuro, var(--naranja-oscuro));
 }
 
 .btn--ghost {
-  background: transparent;
-  color: var(--color-ink-soft);
-  padding: 14px 20px;
-  font-size: 15px;
-  border: 1.5px solid var(--color-border);
+  background: var(--papel);
+  color: var(--tinta);
+  padding: 14px 18px;
+  font-size: 14px;
+  border: 1px solid var(--borde);
 }
 .btn--ghost:active {
-  background: var(--color-bg-soft);
+  background: var(--hueso);
 }
 
 .btn--danger {
-  color: #A84432;
+  color: var(--naranja-oscuro);
 }
 
 .btn--text {
   background: transparent;
-  color: var(--color-ink-soft);
+  color: var(--tinta-suave);
   padding: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -359,35 +353,37 @@ button {
 }
 
 .icon-btn {
-  width: 38px; height: 38px;
+  width: 36px; height: 36px;
   border-radius: 50%;
-  border: 1px solid var(--color-border);
-  background: var(--color-card);
-  color: var(--color-ink-soft);
+  border: 1px solid var(--borde);
+  background: var(--papel);
+  color: var(--tinta-suave);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: background 0.15s ease;
+  flex-shrink: 0;
 }
 .icon-btn:active {
-  transform: scale(0.9);
-  background: var(--color-bg-soft);
+  background: var(--hueso);
 }
 
 /* ==============================================================
-   PANTALLA DE JUEGO
+   PANTALLA DE JUEGO — pareja Rosa + Naranja (Naranja + Lila en Nivel 3)
 ============================================================== */
 #view-juego {
-  padding: 8px 22px 22px;
+  padding: 10px 22px 24px;
   justify-content: space-between;
+  background: var(--hueso);
 }
 
 .game-topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 2px 2px;
+  gap: 12px;
+  padding: 10px 2px 4px;
   z-index: 2;
   position: relative;
 }
@@ -395,38 +391,40 @@ button {
 .level-indicator {
   display: flex;
   align-items: baseline;
-  gap: 6px;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
-  padding: 7px 16px 7px 14px;
+  gap: 7px;
+  min-width: 0;
+  background: var(--papel);
+  padding: 8px 16px;
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-soft);
 }
 .level-indicator-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-ink-soft);
+  letter-spacing: 0.07em;
+  color: var(--tinta-suave);
+  flex-shrink: 0;
 }
 .level-indicator-number {
-  font-family: var(--font-display);
-  font-size: 17px;
-  font-weight: 700;
-  color: var(--color-coral-dark);
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--naranja);
+  flex-shrink: 0;
 }
 .level-indicator-separator {
-  color: var(--color-border);
+  color: var(--borde);
   font-size: 13px;
+  flex-shrink: 0;
 }
 .level-indicator-category {
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-ink-soft);
+  color: var(--tinta-suave);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
+  min-width: 0;
 }
 
 /* --- Escenario de la tarjeta --- */
@@ -435,128 +433,99 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 18px 0;
+  padding: 20px 0;
   min-height: 0;
 }
 
 .question-card {
   width: 100%;
-  background: var(--color-card);
+  background: var(--papel);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-card);
-  padding: 40px 30px 34px;
+  padding: 44px 30px 36px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 22px;
-  min-height: 320px;
+  gap: 24px;
+  min-height: 300px;
   justify-content: center;
   position: relative;
-  border: 1px solid var(--color-border);
 }
 
 .question-card.card--enter {
-  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: cardIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @keyframes cardIn {
-  from { opacity: 0; transform: translateY(22px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Indicador de turno / brújula --- */
+/* --- Indicador de turno: solo texto, sin ningún elemento gráfico --- */
 .turn-indicator {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.turn-compass {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: var(--color-bg-soft);
-  border: 1.5px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-}
-
-.turn-needle {
-  width: 0;
-  height: 0;
-  border-left: 7px solid transparent;
-  border-right: 7px solid transparent;
-  border-bottom: 18px solid var(--color-coral);
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-  transform: rotate(0deg);
-}
-
-/* La aguja rota 180º según quién responda */
-.turn-compass[data-turno="2"] .turn-needle {
-  transform: rotate(180deg);
-}
-.turn-compass[data-turno="ambos"] .turn-needle {
-  border-bottom-color: var(--color-gold);
-  animation: needleSpin 2.6s linear infinite;
-}
-@keyframes needleSpin {
-  to { transform: rotate(360deg); }
 }
 
 .turn-text {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--color-coral-dark);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--naranja);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  background: var(--rosa-suave);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+}
+[data-nivel="3"] .turn-text {
+  background: var(--lila-suave);
+  color: var(--naranja);
 }
 
 .question-category-tag {
   display: none;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--color-gold);
-  background: #FBF0DC;
-  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--lila-oscuro);
+  background: var(--lila-suave);
+  padding: 7px 16px;
   border-radius: var(--radius-pill);
-  margin: -8px 0 0;
+  margin: -10px 0 0;
 }
 .question-category-tag.is-visible {
   display: inline-block;
 }
 
 .question-text {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 27px;
-  line-height: 1.35;
-  color: var(--color-ink);
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--tinta);
   margin: 0;
-  max-width: 40ch;
+  max-width: 38ch;
+  letter-spacing: -0.01em;
 }
 
 /* --- Caja de valoración (Nivel 3) --- */
 .rating-box {
   width: 100%;
-  margin-top: 6px;
-  padding-top: 20px;
-  border-top: 1px solid var(--color-border);
+  margin-top: 4px;
+  padding-top: 24px;
+  border-top: 1px solid var(--borde);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 .rating-box.is-hidden { display: none; }
 
 .rating-label {
   font-size: 13px;
   font-weight: 700;
-  color: var(--color-ink-soft);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--tinta-suave);
   margin: 0;
+  line-height: 1.4;
 }
 
 .rating-options {
@@ -569,43 +538,40 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  background: var(--color-bg-soft);
-  border: 1.5px solid var(--color-border);
+  gap: 6px;
+  background: var(--hueso);
+  border: 1.5px solid var(--borde);
   border-radius: var(--radius-md);
-  padding: 14px 8px;
+  padding: 16px 8px;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 .rating-btn:active {
-  transform: scale(0.95);
+  transform: scale(0.97);
 }
 .rating-btn.is-selected {
-  background: #FBF0DC;
-  border-color: var(--color-gold);
+  background: var(--rosa-suave);
+  border-color: var(--naranja);
 }
 .rating-emoji {
-  font-size: 22px;
+  font-size: 24px;
+  line-height: 1;
 }
 .rating-text {
   font-size: 12px;
   font-weight: 700;
-  color: var(--color-ink);
-  line-height: 1.25;
-}
-.rating-points {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--color-coral-dark);
+  color: var(--tinta);
+  line-height: 1.3;
 }
 
 /* --- Controles inferiores --- */
 .game-controls {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 18px;
   z-index: 2;
   position: relative;
+  padding-top: 4px;
 }
 .game-controls-row {
   display: flex;
@@ -613,100 +579,109 @@ button {
 }
 .game-controls-row .btn {
   flex: 1;
-  font-size: 13.5px;
+  font-size: 13px;
   padding: 13px 10px;
 }
 
 /* ==============================================================
-   CARTA ESPECIAL
+   CARTA ESPECIAL — Naranja sólido, un único color de impacto
 ============================================================== */
+#view-carta {
+  background: var(--naranja);
+}
+#view-carta .game-controls {
+  padding: 24px 22px calc(24px + env(safe-area-inset-bottom));
+}
+
 .special-card {
   width: 100%;
-  background: linear-gradient(155deg, var(--color-plum), #4A2836);
-  color: #FBF0DC;
-  border-radius: var(--radius-lg);
-  padding: 48px 30px;
+  padding: 20px 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 14px;
-  box-shadow: var(--shadow-card);
-  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.special-card-icon {
-  font-size: 30px;
-  color: var(--color-gold);
+  gap: 16px;
 }
 .special-card-eyebrow {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: #E3B98F;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.72);
   margin: 0;
 }
 .special-card-for {
-  font-family: var(--font-display);
-  font-size: 26px;
-  font-weight: 600;
-  margin: 2px 0 6px;
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--papel);
+  margin: 0;
 }
 .special-card-text {
   font-size: 16px;
+  font-weight: 500;
   line-height: 1.5;
-  color: #F3E4D3;
-  max-width: 32ch;
+  color: var(--papel);
+  opacity: 0.92;
+  max-width: 30ch;
   margin: 0;
+}
+#view-carta .btn--primary {
+  background: var(--papel);
+  color: var(--naranja);
 }
 
 /* ==============================================================
-   PANTALLAS DE FIN (nivel / partida)
+   PANTALLAS DE FIN (nivel / partida) — pareja Lila + Amarillo claro
 ============================================================== */
 #view-fin-nivel, #view-final {
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 36px 30px;
-  gap: 16px;
+  padding: 40px 32px;
+  gap: 18px;
+  background: var(--amarillo);
+  --acento: var(--lila-oscuro);
+  --acento-oscuro: #6E5D89;
 }
 
 .end-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   width: 100%;
 }
 
 .end-icon {
-  width: 56px; height: 56px;
+  width: 52px; height: 52px;
   border-radius: 50%;
-  background: var(--color-coral);
-  color: #fff;
+  background: var(--acento, var(--naranja));
+  color: var(--papel);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  margin-bottom: 4px;
+  font-size: 22px;
+  margin-bottom: 2px;
 }
 .end-icon--heart {
-  background: var(--color-plum);
+  background: var(--lila-oscuro);
 }
 
 .end-title {
-  font-family: var(--font-display);
-  font-size: 30px;
-  font-weight: 600;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   margin: 0;
+  color: var(--tinta);
 }
 
 .end-subtitle {
-  font-size: 15px;
-  color: var(--color-ink-soft);
-  max-width: 32ch;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--tinta-suave);
+  max-width: 30ch;
   line-height: 1.5;
-  margin: 0 0 12px;
+  margin: 0 0 14px;
 }
 
 #view-fin-nivel .btn, #view-final .btn {
@@ -715,26 +690,27 @@ button {
 
 .final-scores {
   width: 100%;
-  background: var(--color-card);
-  border: 1px solid var(--color-border);
+  background: var(--papel);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 .final-scores.is-hidden { display: none; }
 .final-score-row {
   display: flex;
   justify-content: space-between;
-  font-size: 16px;
-  font-weight: 600;
+  align-items: baseline;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
 .final-score-row strong {
-  font-family: var(--font-display);
-  color: var(--color-coral-dark);
+  color: var(--acento, var(--naranja));
   font-size: 20px;
+  font-weight: 800;
 }
 
 /* ==============================================================
@@ -743,8 +719,7 @@ button {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(46, 32, 25, 0.45);
-  backdrop-filter: blur(2px);
+  background: rgba(28, 23, 18, 0.4);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -760,13 +735,12 @@ button {
 .modal-sheet {
   width: 100%;
   max-width: 560px;
-  background: var(--color-bg);
-  border-radius: 26px 26px 0 0;
-  padding: 22px 22px calc(22px + env(safe-area-inset-bottom));
+  background: var(--papel);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 22px calc(24px + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   gap: 10px;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
   transform: translateY(0);
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -777,22 +751,23 @@ button {
 .modal-title {
   text-align: center;
   font-weight: 700;
-  font-size: 15px;
-  color: var(--color-ink-soft);
-  margin: 4px 0 8px;
+  font-size: 14px;
+  color: var(--tinta-suave);
+  margin: 4px 0 10px;
 }
 
 .modal-sheet .btn { width: 100%; }
 
 /* ==============================================================
-   RESPONSIVE — ajustes finos para pantallas muy pequeñas
+   RESPONSIVE — ajustes finos para pantallas pequeñas (iPhone SE, etc.)
 ============================================================== */
 @media (max-height: 700px) {
-  .portada-title { font-size: 54px; }
-  .question-card { min-height: 260px; padding: 30px 24px 26px; }
-  .question-text { font-size: 22px; }
+  .portada-title { font-size: 44px; }
+  .question-card { min-height: 250px; padding: 32px 24px 28px; }
+  .question-text { font-size: 20px; }
+  .game-controls { gap: 14px; }
 }
 
 @media (min-width: 420px) {
-  .question-text { font-size: 29px; }
+  .question-text { font-size: 26px; }
 }

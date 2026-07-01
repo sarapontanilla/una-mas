@@ -1,13 +1,13 @@
 /**
  * ============================================================
- *  BASE DE DATOS DE PREGUNTAS
+ *  BASE DE DATOS DE PREGUNTAS — UNA MÁS
  * ============================================================
  * Aquí están todas las preguntas del juego, organizadas por
  * NIVEL y, dentro de cada nivel, por CATEGORÍA.
  *
  * Las categorías son solo para organizar el archivo:
- * el juego NUNCA las muestra al jugador, simplemente mezcla
- * todas las preguntas de un nivel entre sí.
+ * el juego NUNCA las muestra al jugador tal cual el nombre interno,
+ * pero SÍ muestra el nombre de la categoría actual en la topbar.
  *
  * CÓMO AÑADIR UNA PREGUNTA NUEVA:
  *   Busca la categoría que quieras y añade un nuevo objeto
@@ -15,7 +15,8 @@
  *
  * CÓMO CREAR UNA CATEGORÍA NUEVA:
  *   Copia el bloque de una categoría existente dentro del nivel
- *   que quieras y cambia su `nombre` y sus `preguntas`.
+ *   que quieras y cambia su `nombre` y sus `preguntas`. Recuerda
+ *   añadirla también a ORDEN_CATEGORIAS, al final de este archivo.
  *
  * TIPOS DE PREGUNTA (campo "tipo"):
  *   "normal"     -> responde primero uno, luego el otro (por defecto)

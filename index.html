@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<meta name="theme-color" content="#FBF3EC" />
-<title>Cerca — el juego para conoceros</title>
+<meta name="theme-color" content="#FFFDB4" />
+<title>UNA MÁS</title>
 
-<!-- Tipografías: una display cálida y redondeada + una sans limpia para texto -->
+<!-- Tipografía: una única sans-serif moderna para toda la app -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -23,42 +23,22 @@
 ============================================================ -->
 <div id="app">
 
-  <!-- Fondo decorativo ambiental -->
-  <div class="ambient" aria-hidden="true">
-    <div class="ambient-blob ambient-blob--1"></div>
-    <div class="ambient-blob ambient-blob--2"></div>
-  </div>
-
-  <!-- ======================= MARCADOR ======================= -->
-  <!-- Solo visible desde el Nivel 3 en adelante -->
-  <header id="scoreboard" class="scoreboard is-hidden">
-    <div class="score-pill" id="score-pill-1">
-      <span class="score-name" id="score-name-1">Sara</span>
-      <span class="score-value" id="score-value-1">0</span>
-    </div>
-    <div class="score-divider">·</div>
-    <div class="score-pill" id="score-pill-2">
-      <span class="score-name" id="score-name-2">David</span>
-      <span class="score-value" id="score-value-2">0</span>
-    </div>
-  </header>
-
   <!-- ======================= PANTALLA: PORTADA ======================= -->
   <section id="view-portada" class="view view--active">
     <div class="portada-content">
       <div class="portada-eyebrow">un juego para dos</div>
-      <h1 class="portada-title">Cerca</h1>
+      <h1 class="portada-title">UNA MÁS</h1>
       <p class="portada-subtitle">Preguntas para conoceros de verdad, un nivel a la vez.</p>
 
       <div class="portada-players">
         <div class="player-chip player-chip--a">
           <span class="player-dot"></span>
-          <span id="portada-nombre-1">Sara</span>
+          <span id="portada-nombre-1">SARA</span>
         </div>
         <span class="portada-players-and">&amp;</span>
         <div class="player-chip player-chip--b">
           <span class="player-dot"></span>
-          <span id="portada-nombre-2">David</span>
+          <span id="portada-nombre-2">DAVID</span>
         </div>
       </div>
 
@@ -73,6 +53,21 @@
   <!-- ======================= PANTALLA: JUEGO (pregunta) ======================= -->
   <section id="view-juego" class="view">
 
+    <!-- Marcador: solo visible en Nivel 3. Vive dentro de esta vista para
+         que, al aparecer, empuje el resto de elementos hacia abajo en vez
+         de superponerse a la barra de nivel/categoría. -->
+    <header id="scoreboard" class="scoreboard is-hidden">
+      <div class="score-pill" id="score-pill-1">
+        <span class="score-name" id="score-name-1">SARA</span>
+        <span class="score-value" id="score-value-1">0</span>
+      </div>
+      <div class="score-divider">·</div>
+      <div class="score-pill" id="score-pill-2">
+        <span class="score-name" id="score-name-2">DAVID</span>
+        <span class="score-value" id="score-value-2">0</span>
+      </div>
+    </header>
+
     <div class="game-topbar">
       <div class="level-indicator">
         <span class="level-indicator-label">Nivel</span>
@@ -81,7 +76,7 @@
         <span class="level-indicator-category" id="categoria-actual-nombre">Elige uno</span>
       </div>
       <button class="icon-btn" id="btn-menu" aria-label="Opciones de partida">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
       </button>
     </div>
 
@@ -89,39 +84,32 @@
     <div class="card-stage">
       <div class="question-card" id="question-card">
         <div class="turn-indicator" id="turn-indicator">
-          <div class="turn-compass" id="turn-compass">
-            <div class="turn-needle" id="turn-needle"></div>
-          </div>
-          <span class="turn-text" id="turn-text">Responde Sara</span>
+          <span class="turn-text" id="turn-text">Responde SARA</span>
         </div>
 
         <p class="question-category-tag" id="elige-uno-tag">Respondéis los dos a la vez</p>
 
         <p class="question-text" id="question-text">Cargando pregunta…</p>
 
-        <!-- Valoración: solo aparece en Nivel 3, después de responder -->
+        <!-- Valoración: solo aparece en Nivel 3, después de cada respuesta -->
         <div class="rating-box is-hidden" id="rating-box">
           <p class="rating-label" id="rating-label">¿Qué te ha parecido la respuesta?</p>
           <div class="rating-options">
             <button class="rating-btn" data-rating="3">
               <span class="rating-emoji">⭐</span>
               <span class="rating-text">Muy buena</span>
-              <span class="rating-points">+3</span>
             </button>
             <button class="rating-btn" data-rating="2">
-              <span class="rating-emoji">👍</span>
+              <span class="rating-emoji">🤘🏼</span>
               <span class="rating-text">Buena</span>
-              <span class="rating-points">+2</span>
             </button>
             <button class="rating-btn" data-rating="1">
-              <span class="rating-emoji">😐</span>
+              <span class="rating-emoji">🌼</span>
               <span class="rating-text">Correcta</span>
-              <span class="rating-points">+1</span>
             </button>
             <button class="rating-btn" data-rating="0">
-              <span class="rating-emoji">🙈</span>
-              <span class="rating-text">Podrías haberte mojado más</span>
-              <span class="rating-points">+0</span>
+              <span class="rating-emoji">🫠</span>
+              <span class="rating-text">No te mojaste nada</span>
             </button>
           </div>
         </div>
@@ -148,9 +136,8 @@
   <section id="view-carta" class="view">
     <div class="card-stage">
       <div class="special-card">
-        <div class="special-card-icon">✦</div>
-        <p class="special-card-eyebrow">Carta especial</p>
-        <p class="special-card-for" id="special-card-for">Turno de Sara</p>
+        <p class="special-card-eyebrow">CARTA ESPECIAL ✨</p>
+        <p class="special-card-for" id="special-card-for">Turno de SARA</p>
         <p class="special-card-text">Ahora haz una pregunta completamente libre a la otra persona.</p>
       </div>
     </div>
@@ -185,11 +172,11 @@
 
       <div class="final-scores is-hidden" id="final-scores">
         <div class="final-score-row">
-          <span id="final-nombre-1">Sara</span>
+          <span id="final-nombre-1">SARA</span>
           <strong id="final-puntos-1">0</strong>
         </div>
         <div class="final-score-row">
-          <span id="final-nombre-2">David</span>
+          <span id="final-nombre-2">DAVID</span>
           <strong id="final-puntos-2">0</strong>
         </div>
       </div>

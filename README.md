@@ -1,4 +1,4 @@
-# Cerca — juego de preguntas para dos
+# UNA MÁS — juego de preguntas para dos
 
 Una web-app para conocerse mejor, jugando entre dos personas y pasándose el móvil.
 
@@ -9,7 +9,7 @@ No necesita servidor ni instalación: son solo HTML, CSS y JavaScript puros.
 
 > Si la abres directamente desde el explorador de archivos y algo no carga bien
 > por las restricciones de seguridad del navegador con archivos locales, puedes
-> subir los 3 archivos a cualquier hosting estático gratuito (GitHub Pages,
+> subir los 4 archivos a cualquier hosting estático gratuito (GitHub Pages,
 > Netlify, Vercel...) y funcionará sin problema.
 
 ## Archivos
@@ -17,7 +17,7 @@ No necesita servidor ni instalación: son solo HTML, CSS y JavaScript puros.
 - **`index.html`** — estructura de la app y todas las "pantallas".
 - **`styles.css`** — todo el diseño visual (colores, tipografía, animaciones).
 - **`preguntas.js`** — la base de datos de preguntas, organizada por nivel y categoría.
-- **`app.js`** — toda la lógica del juego (turnos, niveles, puntuación, cartas especiales).
+- **`app.js`** — toda la lógica del juego (turnos, niveles, valoración, cartas especiales).
 
 ## Cómo cambiar los nombres de los jugadores
 
@@ -27,6 +27,9 @@ Abre `app.js` y modifica estas dos líneas al principio del archivo:
 const JUGADOR_1 = "Sara";
 const JUGADOR_2 = "David";
 ```
+
+Se mostrarán siempre en **mayúsculas** en toda la aplicación automáticamente,
+sin que tengas que escribirlos en mayúsculas aquí.
 
 ## Cómo añadir o editar preguntas
 
@@ -46,8 +49,8 @@ línea más dentro del array `preguntas` de la categoría que quieras:
 }
 ```
 
-Las categorías nunca se muestran al jugador: solo sirven para organizar el
-archivo. El juego mezcla todas las preguntas de un nivel entre sí.
+El nombre de la categoría sí se muestra al jugador, en la barra superior,
+junto al nivel actual.
 
 ## Cómo funciona el juego (resumen)
 
@@ -57,19 +60,33 @@ archivo. El juego mezcla todas las preguntas de un nivel entre sí.
 - Arriba siempre se ve el **Nivel** y la **Categoría** en la que estás.
 - El turno de quién responde primero se alterna automáticamente en cada pregunta.
 - Las preguntas de "Elige uno" (Nivel 1) piden que respondáis los dos a la vez.
-- Botón **"Siguiente pregunta"**: saca otra pregunta al azar de la misma categoría.
+- Botón **"Siguiente pregunta"**: saca otra pregunta al azar de la misma categoría
+  (en Nivel 3 este mismo botón guía todo el flujo de doble respuesta, ver abajo).
 - Botón **"Siguiente categoría"**: pasa manualmente a la siguiente categoría del
   nivel. Cuando ya estás en la última categoría del nivel, este mismo botón
   cambia automáticamente a **"Pasar al nivel N"**.
 - Si se agotan las preguntas de una categoría, la app pasa sola a la siguiente
   categoría (o muestra la pantalla de fin de nivel si era la última).
-- Cada 10 preguntas respondidas aparece una **Carta Especial** con una pregunta
-  libre, alternando el turno entre los dos jugadores.
-- En el **Nivel 3** se activa un sistema de valoración: después de cada
-  respuesta, el otro jugador puntúa con ⭐ 👍 😐 🙈, sumando puntos a un
-  marcador visible en la parte superior.
+- Cada **20 preguntas** respondidas aparece una **Carta Especial ✨** con una
+  pregunta libre, alternando el turno entre los dos jugadores.
 - Los jugadores deciden libremente cuándo pasar de nivel o terminar la partida
   con los botones correspondientes.
+
+### Sistema de doble valoración (solo Nivel 3)
+
+En el Nivel 3 cada pregunta sigue este flujo completo antes de pasar a la
+siguiente:
+
+1. Responde el primer jugador.
+2. El otro jugador valora esa respuesta (⭐ 🤘🏼 🌼 🫠) y se suman los puntos
+   automáticamente. La pregunta en pantalla **no cambia**.
+3. Ahora responde el segundo jugador, a la misma pregunta.
+4. El primer jugador valora esa segunda respuesta, sumando sus puntos.
+5. Solo entonces la app pasa a una pregunta nueva.
+
+El marcador de puntos, visible arriba solo durante el Nivel 3, se actualiza
+en cada valoración. El botón principal no deja avanzar de fase sin haber
+elegido antes una valoración.
 
 ### Orden de las categorías
 
@@ -85,3 +102,24 @@ Nivel 1                        Nivel 2                       Nivel 3
 Este orden se define en `preguntas.js`, dentro del objeto `ORDEN_CATEGORIAS`,
 totalmente separado del contenido de las preguntas — así que puedes reordenar
 las categorías sin tocar ni una sola pregunta.
+
+## Identidad visual
+
+Paleta de marca (colores planos, sin degradados en ningún sitio):
+
+| Color           | Hex       |
+|-----------------|-----------|
+| Naranja         | `#EB4213` |
+| Rosa            | `#FF99DC` |
+| Lila            | `#BCACCE` |
+| Amarillo claro  | `#FFFDB4` |
+
+Cada pantalla usa una única pareja dominante para mantener coherencia:
+
+- **Portada y pantallas de fin** → Lila + Amarillo claro
+- **Pantalla de juego (Niveles 1 y 2)** → Rosa + Naranja
+- **Nivel 3** → Naranja + Lila
+- **Carta especial** → Naranja sólido
+
+Tipografía: **Plus Jakarta Sans** (sans-serif) en toda la aplicación, sin
+ninguna fuente con serifa.
