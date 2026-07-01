@@ -137,7 +137,6 @@ const el = {
 
   questionCard: document.getElementById("question-card"),
   turnText: document.getElementById("turn-text"),
-  eligeUnoTag: document.getElementById("elige-uno-tag"),
   questionText: document.getElementById("question-text"),
 
   ratingBox: document.getElementById("rating-box"),
@@ -362,12 +361,6 @@ function renderizarPregunta() {
 
   el.questionText.textContent = pregunta.texto;
 
-  if (esEligeUno) {
-    el.eligeUnoTag.classList.add("is-visible");
-  } else {
-    el.eligeUnoTag.classList.remove("is-visible");
-  }
-
   if (nivelConValoracion() && !esEligeUno) {
     // Nivel 3: arrancamos el flujo de doble respuesta + doble valoración.
     estado.fase = "responder_1";
@@ -438,7 +431,10 @@ function limpiarSeleccionValoracion() {
 function manejarValoracion(puntos, boton) {
   // Si ya había una valoración elegida para esta fase, deshacemos su
   // puntuación antes de aplicar la nueva (por si el jugador cambia de opinión).
-  if (estado.valoracionYaAplicada) {
+  // Usamos "!== null" en vez de comprobar solo el valor, porque una
+  // valoración de 0 puntos (🫠) es perfectamente válida y no debe
+  // tratarse como "sin seleccionar".
+  if (estado.valoracionYaAplicada !== null) {
     estado.puntuaciones[estado.jugadorQueResponde] -= estado.valoracionYaAplicada;
   }
 
@@ -469,7 +465,8 @@ function actualizarTextoBotonPrincipal() {
     el.btnSiguientePregunta.disabled = false;
   } else if (estado.fase === "valorar_1" || estado.fase === "valorar_2") {
     el.btnSiguientePregunta.textContent = "Confirmar valoración";
-    el.btnSiguientePregunta.disabled = !estado.valoracionYaAplicada;
+    // "!== null" en vez de truthiness: una valoración de 0 puntos también habilita el botón.
+    el.btnSiguientePregunta.disabled = estado.valoracionYaAplicada === null;
   } else {
     el.btnSiguientePregunta.textContent = "Siguiente pregunta";
     el.btnSiguientePregunta.disabled = false;
@@ -494,7 +491,7 @@ function avanzarFaseNivel3() {
   }
 
   if (estado.fase === "valorar_1") {
-    if (!estado.valoracionYaAplicada) return; // no se puede confirmar sin elegir una opción
+    if (estado.valoracionYaAplicada === null) return; // no se puede confirmar sin elegir una opción
     estado.fase = "responder_2";
     estado.jugadorQueResponde = otroJugador(estado.jugadorQueResponde);
     el.ratingBox.classList.add("is-hidden");
@@ -515,7 +512,7 @@ function avanzarFaseNivel3() {
   }
 
   if (estado.fase === "valorar_2") {
-    if (!estado.valoracionYaAplicada) return; // no se puede confirmar sin elegir una opción
+    if (estado.valoracionYaAplicada === null) return; // no se puede confirmar sin elegir una opción
     // Ambos jugadores ya respondieron y fueron valorados: pasamos a la pregunta siguiente de verdad.
     estado.fase = null;
     estado.jugadorQueResponde = null;
