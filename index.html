@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#FBF3EC" />
+<title>Cerca — el juego para conoceros</title>
+
+<!-- Tipografías: una display cálida y redondeada + una sans limpia para texto -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     ESTRUCTURA GENERAL
+     La app es una única pantalla que va cambiando de "vista"
+     (portada, pregunta, carta especial, fin de nivel, etc.)
+     mediante clases CSS. Todo vive dentro de #app.
+============================================================ -->
+<div id="app">
+
+  <!-- Fondo decorativo ambiental -->
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient-blob ambient-blob--1"></div>
+    <div class="ambient-blob ambient-blob--2"></div>
+  </div>
+
+  <!-- ======================= MARCADOR ======================= -->
+  <!-- Solo visible desde el Nivel 3 en adelante -->
+  <header id="scoreboard" class="scoreboard is-hidden">
+    <div class="score-pill" id="score-pill-1">
+      <span class="score-name" id="score-name-1">Sara</span>
+      <span class="score-value" id="score-value-1">0</span>
+    </div>
+    <div class="score-divider">·</div>
+    <div class="score-pill" id="score-pill-2">
+      <span class="score-name" id="score-name-2">David</span>
+      <span class="score-value" id="score-value-2">0</span>
+    </div>
+  </header>
+
+  <!-- ======================= PANTALLA: PORTADA ======================= -->
+  <section id="view-portada" class="view view--active">
+    <div class="portada-content">
+      <div class="portada-eyebrow">un juego para dos</div>
+      <h1 class="portada-title">Cerca</h1>
+      <p class="portada-subtitle">Preguntas para conoceros de verdad, un nivel a la vez.</p>
+
+      <div class="portada-players">
+        <div class="player-chip player-chip--a">
+          <span class="player-dot"></span>
+          <span id="portada-nombre-1">Sara</span>
+        </div>
+        <span class="portada-players-and">&amp;</span>
+        <div class="player-chip player-chip--b">
+          <span class="player-dot"></span>
+          <span id="portada-nombre-2">David</span>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--large" id="btn-empezar">
+        Empezar a jugar
+      </button>
+
+      <p class="portada-hint">Nivel 1 · id y ve pasándoos el móvil</p>
+    </div>
+  </section>
+
+  <!-- ======================= PANTALLA: JUEGO (pregunta) ======================= -->
+  <section id="view-juego" class="view">
+
+    <div class="game-topbar">
+      <div class="level-indicator">
+        <span class="level-indicator-label">Nivel</span>
+        <span class="level-indicator-number" id="nivel-actual-num">1</span>
+      </div>
+      <button class="icon-btn" id="btn-menu" aria-label="Opciones de partida">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
+      </button>
+    </div>
+
+    <!-- Tarjeta principal de la pregunta -->
+    <div class="card-stage">
+      <div class="question-card" id="question-card">
+        <div class="turn-indicator" id="turn-indicator">
+          <div class="turn-compass" id="turn-compass">
+            <div class="turn-needle" id="turn-needle"></div>
+          </div>
+          <span class="turn-text" id="turn-text">Responde Sara</span>
+        </div>
+
+        <p class="question-category-tag" id="elige-uno-tag">Respondéis los dos a la vez</p>
+
+        <p class="question-text" id="question-text">Cargando pregunta…</p>
+
+        <!-- Valoración: solo aparece en Nivel 3, después de responder -->
+        <div class="rating-box is-hidden" id="rating-box">
+          <p class="rating-label" id="rating-label">¿Qué te ha parecido la respuesta?</p>
+          <div class="rating-options">
+            <button class="rating-btn" data-rating="3">
+              <span class="rating-emoji">⭐</span>
+              <span class="rating-text">Muy buena</span>
+              <span class="rating-points">+3</span>
+            </button>
+            <button class="rating-btn" data-rating="2">
+              <span class="rating-emoji">👍</span>
+              <span class="rating-text">Buena</span>
+              <span class="rating-points">+2</span>
+            </button>
+            <button class="rating-btn" data-rating="1">
+              <span class="rating-emoji">😐</span>
+              <span class="rating-text">Correcta</span>
+              <span class="rating-points">+1</span>
+            </button>
+            <button class="rating-btn" data-rating="0">
+              <span class="rating-emoji">🙈</span>
+              <span class="rating-text">Podrías haberte mojado más</span>
+              <span class="rating-points">+0</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controles inferiores -->
+    <div class="game-controls">
+      <button class="btn btn--primary btn--large" id="btn-siguiente-pregunta">
+        Siguiente pregunta
+      </button>
+      <div class="game-controls-row">
+        <button class="btn btn--ghost" id="btn-siguiente-nivel">
+          Pasar al nivel <span id="btn-siguiente-nivel-num">2</span>
+        </button>
+        <button class="btn btn--ghost btn--danger" id="btn-terminar">
+          Terminar partida
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= PANTALLA: CARTA ESPECIAL ======================= -->
+  <section id="view-carta" class="view">
+    <div class="card-stage">
+      <div class="special-card">
+        <div class="special-card-icon">✦</div>
+        <p class="special-card-eyebrow">Carta especial</p>
+        <p class="special-card-for" id="special-card-for">Turno de Sara</p>
+        <p class="special-card-text">Ahora haz una pregunta completamente libre a la otra persona.</p>
+      </div>
+    </div>
+    <div class="game-controls">
+      <button class="btn btn--primary btn--large" id="btn-continuar-tras-carta">
+        Continuar
+      </button>
+    </div>
+  </section>
+
+  <!-- ======================= PANTALLA: FIN DE NIVEL / SIN PREGUNTAS ======================= -->
+  <section id="view-fin-nivel" class="view">
+    <div class="end-content">
+      <div class="end-icon">✓</div>
+      <h2 class="end-title" id="fin-nivel-titulo">¡Nivel 1 completo!</h2>
+      <p class="end-subtitle" id="fin-nivel-subtitulo">Habéis respondido todas las preguntas de este nivel.</p>
+      <button class="btn btn--primary btn--large" id="btn-avanzar-nivel">
+        Ir al nivel <span id="btn-avanzar-nivel-num">2</span>
+      </button>
+      <button class="btn btn--ghost" id="btn-terminar-desde-fin">
+        Terminar partida
+      </button>
+    </div>
+  </section>
+
+  <!-- ======================= PANTALLA: FIN DE PARTIDA ======================= -->
+  <section id="view-final" class="view">
+    <div class="end-content">
+      <div class="end-icon end-icon--heart">♥</div>
+      <h2 class="end-title">Habéis terminado la partida</h2>
+      <p class="end-subtitle" id="final-resumen">Gracias por jugar y por conoceros un poco más.</p>
+
+      <div class="final-scores is-hidden" id="final-scores">
+        <div class="final-score-row">
+          <span id="final-nombre-1">Sara</span>
+          <strong id="final-puntos-1">0</strong>
+        </div>
+        <div class="final-score-row">
+          <span id="final-nombre-2">David</span>
+          <strong id="final-puntos-2">0</strong>
+        </div>
+      </div>
+
+      <button class="btn btn--primary btn--large" id="btn-jugar-de-nuevo">
+        Jugar otra vez
+      </button>
+    </div>
+  </section>
+
+  <!-- ======================= MENÚ / OPCIONES (modal simple) ======================= -->
+  <div class="modal-backdrop is-hidden" id="menu-backdrop">
+    <div class="modal-sheet">
+      <p class="modal-title">Opciones de la partida</p>
+      <button class="btn btn--ghost" id="btn-menu-siguiente-nivel">Pasar al siguiente nivel</button>
+      <button class="btn btn--ghost btn--danger" id="btn-menu-terminar">Terminar partida</button>
+      <button class="btn btn--text" id="btn-menu-cerrar">Cancelar</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="preguntas.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

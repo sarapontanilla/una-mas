@@ -1,0 +1,784 @@
+/* ==============================================================
+   CERCA — HOJA DE ESTILOS
+   ==============================================================
+   Sistema de diseño:
+   - Paleta cálida "sobremesa": crema, terracota, ciruela y oro,
+     pensada para sentirse como una cita agradable, no como una
+     app corporativa.
+   - Tipografía: Fraunces (display, con personalidad, itálica en
+     los momentos emocionales) + Manrope (texto, muy legible).
+   - Elemento de firma: la "brújula de turno", una aguja que
+     apunta físicamente hacia quién debe responder — referencia
+     directa al gesto de pasarse el móvil de mano en mano.
+============================================================== */
+
+:root {
+  /* --- Paleta --- */
+  --color-bg:          #FBF3EC;   /* crema cálido de fondo */
+  --color-bg-soft:     #F4E6D8;   /* crema más oscuro para tarjetas secundarias */
+  --color-ink:         #2E2019;   /* texto principal, marrón casi negro */
+  --color-ink-soft:     #6B5A50;  /* texto secundario */
+  --color-coral:       #E2694F;   /* acento principal — coral/terracota */
+  --color-coral-dark:  #C6512E;
+  --color-plum:        #6B3B4C;   /* acento secundario — ciruela, para nivel 3 */
+  --color-gold:        #CC9A3E;   /* acento estrella / valoración */
+  --color-card:        #FFFDFA;   /* blanco cálido de tarjeta */
+  --color-border:      #E9D9C7;
+
+  /* --- Tipografía --- */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* --- Forma --- */
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+  --radius-pill: 999px;
+
+  /* --- Sombra --- */
+  --shadow-card: 0 20px 45px -20px rgba(46, 32, 25, 0.28), 0 2px 8px rgba(46, 32, 25, 0.06);
+  --shadow-soft: 0 8px 24px -12px rgba(46, 32, 25, 0.18);
+
+  color-scheme: light;
+}
+
+/* Cuando estamos en Nivel 3, la app cambia sutilmente de tono
+   hacia la ciruela para marcar que "esto va más en serio" */
+[data-nivel="3"] {
+  --color-coral: #6B3B4C;
+  --color-coral-dark: #532A38;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+button {
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Respeta preferencia de movimiento reducido */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ==============================================================
+   CONTENEDOR PRINCIPAL
+============================================================== */
+#app {
+  position: relative;
+  height: 100vh;
+  height: 100dvh;
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+}
+
+/* Fondo ambiental: manchas de color muy suaves */
+.ambient {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ambient-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.35;
+}
+.ambient-blob--1 {
+  width: 320px; height: 320px;
+  background: #F4B79B;
+  top: -120px; right: -100px;
+}
+.ambient-blob--2 {
+  width: 280px; height: 280px;
+  background: #E8CBA8;
+  bottom: -100px; left: -90px;
+}
+
+/* ==============================================================
+   VISTAS (pantallas)
+   Cada .view ocupa toda la app; se muestra/oculta con clases.
+============================================================== */
+.view {
+  position: absolute;
+  inset: 0;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  display: none;
+  flex-direction: column;
+  z-index: 1;
+  opacity: 0;
+}
+
+.view.view--active {
+  display: flex;
+}
+
+.view.view--entering {
+  animation: viewIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.view.view--leaving {
+  animation: viewOut 0.28s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes viewOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-10px) scale(0.99); }
+}
+
+/* ==============================================================
+   MARCADOR (scoreboard) — solo Nivel 3
+============================================================== */
+.scoreboard {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px 4px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.scoreboard.is-hidden {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.score-pill {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-soft);
+}
+.score-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+.score-value {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--color-coral-dark);
+  transition: transform 0.25s ease;
+}
+.score-value.bump {
+  animation: scoreBump 0.4s ease;
+}
+@keyframes scoreBump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.35); color: var(--color-gold); }
+  100% { transform: scale(1); }
+}
+.score-divider {
+  color: var(--color-ink-soft);
+  opacity: 0.5;
+  font-size: 14px;
+}
+
+/* ==============================================================
+   PORTADA
+============================================================== */
+#view-portada {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 28px;
+}
+
+.portada-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.portada-eyebrow {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-coral-dark);
+  margin-bottom: 10px;
+}
+
+.portada-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 68px;
+  line-height: 0.95;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.portada-subtitle {
+  font-size: 16px;
+  color: var(--color-ink-soft);
+  max-width: 300px;
+  margin: 14px 0 30px;
+  line-height: 1.5;
+}
+
+.portada-players {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 40px;
+}
+
+.player-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 15px;
+  box-shadow: var(--shadow-soft);
+}
+.player-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+}
+.player-chip--a .player-dot { background: var(--color-coral); }
+.player-chip--b .player-dot { background: var(--color-plum); }
+
+.portada-players-and {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-ink-soft);
+  font-size: 18px;
+}
+
+.portada-hint {
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--color-ink-soft);
+  opacity: 0.75;
+}
+
+/* ==============================================================
+   BOTONES
+============================================================== */
+.btn {
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  border-radius: var(--radius-pill);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn--large {
+  width: 100%;
+  padding: 18px 24px;
+  font-size: 17px;
+}
+
+.btn--primary {
+  background: var(--color-coral);
+  color: #FFF8F3;
+  box-shadow: 0 14px 28px -12px rgba(198, 81, 46, 0.55);
+}
+.btn--primary:hover {
+  background: var(--color-coral-dark);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-ink-soft);
+  padding: 14px 20px;
+  font-size: 15px;
+  border: 1.5px solid var(--color-border);
+}
+.btn--ghost:active {
+  background: var(--color-bg-soft);
+}
+
+.btn--danger {
+  color: #A84432;
+}
+
+.btn--text {
+  background: transparent;
+  color: var(--color-ink-soft);
+  padding: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.icon-btn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.icon-btn:active {
+  transform: scale(0.9);
+  background: var(--color-bg-soft);
+}
+
+/* ==============================================================
+   PANTALLA DE JUEGO
+============================================================== */
+#view-juego {
+  padding: 8px 22px 22px;
+  justify-content: space-between;
+}
+
+.game-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 2px 2px;
+  z-index: 2;
+  position: relative;
+}
+
+.level-indicator {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  padding: 7px 16px 7px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-soft);
+}
+.level-indicator-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-soft);
+}
+.level-indicator-number {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-coral-dark);
+}
+
+/* --- Escenario de la tarjeta --- */
+.card-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 0;
+  min-height: 0;
+}
+
+.question-card {
+  width: 100%;
+  background: var(--color-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 40px 30px 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 22px;
+  min-height: 320px;
+  justify-content: center;
+  position: relative;
+  border: 1px solid var(--color-border);
+}
+
+.question-card.card--enter {
+  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* --- Indicador de turno / brújula --- */
+.turn-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.turn-compass {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--color-bg-soft);
+  border: 1.5px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.turn-needle {
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-bottom: 18px solid var(--color-coral);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform: rotate(0deg);
+}
+
+/* La aguja rota 180º según quién responda */
+.turn-compass[data-turno="2"] .turn-needle {
+  transform: rotate(180deg);
+}
+.turn-compass[data-turno="ambos"] .turn-needle {
+  border-bottom-color: var(--color-gold);
+  animation: needleSpin 2.6s linear infinite;
+}
+@keyframes needleSpin {
+  to { transform: rotate(360deg); }
+}
+
+.turn-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-coral-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.question-category-tag {
+  display: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-gold);
+  background: #FBF0DC;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  margin: -8px 0 0;
+}
+.question-category-tag.is-visible {
+  display: inline-block;
+}
+
+.question-text {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 27px;
+  line-height: 1.35;
+  color: var(--color-ink);
+  margin: 0;
+  max-width: 40ch;
+}
+
+/* --- Caja de valoración (Nivel 3) --- */
+.rating-box {
+  width: 100%;
+  margin-top: 6px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rating-box.is-hidden { display: none; }
+
+.rating-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.rating-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.rating-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-bg-soft);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.rating-btn:active {
+  transform: scale(0.95);
+}
+.rating-btn.is-selected {
+  background: #FBF0DC;
+  border-color: var(--color-gold);
+}
+.rating-emoji {
+  font-size: 22px;
+}
+.rating-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.25;
+}
+.rating-points {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-coral-dark);
+}
+
+/* --- Controles inferiores --- */
+.game-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2;
+  position: relative;
+}
+.game-controls-row {
+  display: flex;
+  gap: 10px;
+}
+.game-controls-row .btn {
+  flex: 1;
+  font-size: 13.5px;
+  padding: 13px 10px;
+}
+
+/* ==============================================================
+   CARTA ESPECIAL
+============================================================== */
+.special-card {
+  width: 100%;
+  background: linear-gradient(155deg, var(--color-plum), #4A2836);
+  color: #FBF0DC;
+  border-radius: var(--radius-lg);
+  padding: 48px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+  animation: cardIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.special-card-icon {
+  font-size: 30px;
+  color: var(--color-gold);
+}
+.special-card-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #E3B98F;
+  margin: 0;
+}
+.special-card-for {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 600;
+  margin: 2px 0 6px;
+}
+.special-card-text {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #F3E4D3;
+  max-width: 32ch;
+  margin: 0;
+}
+
+/* ==============================================================
+   PANTALLAS DE FIN (nivel / partida)
+============================================================== */
+#view-fin-nivel, #view-final {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 36px 30px;
+  gap: 16px;
+}
+
+.end-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.end-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--color-coral);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+.end-icon--heart {
+  background: var(--color-plum);
+}
+
+.end-title {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.end-subtitle {
+  font-size: 15px;
+  color: var(--color-ink-soft);
+  max-width: 32ch;
+  line-height: 1.5;
+  margin: 0 0 12px;
+}
+
+#view-fin-nivel .btn, #view-final .btn {
+  width: 100%;
+}
+
+.final-scores {
+  width: 100%;
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.final-scores.is-hidden { display: none; }
+.final-score-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  font-weight: 600;
+}
+.final-score-row strong {
+  font-family: var(--font-display);
+  color: var(--color-coral-dark);
+  font-size: 20px;
+}
+
+/* ==============================================================
+   MODAL / MENÚ
+============================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(46, 32, 25, 0.45);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 10;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+}
+.modal-backdrop.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-sheet {
+  width: 100%;
+  max-width: 560px;
+  background: var(--color-bg);
+  border-radius: 26px 26px 0 0;
+  padding: 22px 22px calc(22px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+  transform: translateY(0);
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.modal-backdrop.is-hidden .modal-sheet {
+  transform: translateY(100%);
+}
+
+.modal-title {
+  text-align: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-ink-soft);
+  margin: 4px 0 8px;
+}
+
+.modal-sheet .btn { width: 100%; }
+
+/* ==============================================================
+   RESPONSIVE — ajustes finos para pantallas muy pequeñas
+============================================================== */
+@media (max-height: 700px) {
+  .portada-title { font-size: 54px; }
+  .question-card { min-height: 260px; padding: 30px 24px 26px; }
+  .question-text { font-size: 22px; }
+}
+
+@media (min-width: 420px) {
+  .question-text { font-size: 29px; }
+}
