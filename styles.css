@@ -1,41 +1,44 @@
 /* ==============================================================
    UNA MÁS — HOJA DE ESTILOS
    ==============================================================
-   Sistema de diseño:
-   - Paleta plana y editorial: naranja, rosa, lila y amarillo claro.
-     Cada pantalla usa como máximo una pareja de color dominante,
-     nunca los cuatro colores a la vez:
-       · Portada / cierre de partida  → Lila + Amarillo claro
-       · Pantalla de juego            → Rosa + Naranja
-       · Nivel 3                      → Naranja + Lila
-       · Carta especial               → Naranja sólido
-     Sin degradados en ningún sitio: todo son colores planos.
-   - Tipografía: una única sans-serif moderna (Plus Jakarta Sans)
-     para toda la aplicación, sin serif en ningún punto.
-   - Mucho aire: espaciados generosos, jerarquía clara, sin sombras
-     exageradas ni efectos llamativos — sensación de producto de
-     diseño, no de juego casual.
+   Sistema de diseño — paleta ESTRICTA:
+     · Naranja  #EB4213
+     · Rosa     #FF99DC
+     · Lila     #E3D4F4
+     · Amarillo #FFFDB4
+     · Blanco y negro (solo como neutros: texto y superficies "papel")
+
+   No se usa ningún otro color de apoyo (nada de crema, beige, arena,
+   grises cálidos, sombras marcadas ni tintes/derivados de los colores
+   de marca). Todo es 100% plano: sin degradados, sin transparencias
+   decorativas, sin sombras dramáticas.
+
+   Cada pantalla usa el fondo sólido de UN color de marca + UN color
+   de marca como acento — nunca los cuatro a la vez, y nunca mezclando
+   las parejas prohibidas (Rosa+Lila, Naranja+Amarillo):
+     · Portada / cierre de partida → fondo Amarillo, acento Lila
+     · Pantalla de juego (Niv 1-2) → fondo Rosa,     acento Naranja
+     · Pantalla de juego (Nivel 3) → fondo Lila,     acento Naranja
+     · Carta especial              → fondo Naranja (color único, sin pareja)
+
+   Tipografía: una única sans-serif moderna (Plus Jakarta Sans) en
+   toda la aplicación.
 ============================================================== */
 
 :root {
-  /* --- Paleta de marca (usar solo estas 4 + neutros) --- */
-  --naranja:      #EB4213;
-  --rosa:         #FF99DC;
-  --lila:         #BCACCE;
-  --amarillo:     #FFFDB4;
+  /* --- Paleta de marca: ÚNICAMENTE estos cuatro colores --- */
+  --naranja:   #EB4213;
+  --rosa:      #FF99DC;
+  --lila:      #E3D4F4;
+  --amarillo:  #FFFDB4;
 
-  /* --- Neutros editoriales --- */
-  --tinta:        #1C1712;   /* texto principal, casi negro */
-  --tinta-suave:  #6B6459;   /* texto secundario */
-  --papel:        #FFFFFF;   /* blanco de tarjeta */
-  --hueso:        #FAF8F2;   /* fondo neutro cálido, base de la app */
-  --borde:        #EAE4D8;
+  /* --- Neutros: únicamente blanco y negro --- */
+  --negro:     #000000;
+  --blanco:    #FFFFFF;
 
-  /* --- Colores funcionales derivados de la paleta de marca --- */
-  --lila-suave:   #E9E3F0;   /* lila muy claro, para fondos */
-  --lila-oscuro:  #8C79A6;   /* lila para texto sobre amarillo */
-  --naranja-oscuro: #C23A10;
-  --rosa-suave:   #FFE3F4;
+  /* --- Acento de pantalla: se sobrescribe por vista más abajo --- */
+  --acento:        var(--naranja);
+  --acento-texto:  var(--blanco);
 
   /* --- Tipografía: una sola familia sans-serif --- */
   --font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -46,16 +49,8 @@
   --radius-sm: 12px;
   --radius-pill: 999px;
 
-  /* --- Sombra: mínima, solo para separar planos, nunca dramática --- */
-  --shadow-card: 0 1px 2px rgba(28, 23, 18, 0.04), 0 8px 24px rgba(28, 23, 18, 0.06);
-  --shadow-soft: 0 1px 2px rgba(28, 23, 18, 0.05);
-
   color-scheme: light;
 }
-
-/* Nivel 3 cambia de pareja cromática: Naranja + Lila en vez de Rosa + Naranja.
-   El cambio se aplica directamente en los selectores [data-nivel="3"] ... más
-   abajo (p. ej. el fondo del texto de turno). */
 
 * { box-sizing: border-box; }
 
@@ -68,8 +63,8 @@ html, body {
 
 body {
   font-family: var(--font);
-  background: var(--hueso);
-  color: var(--tinta);
+  background: var(--blanco);
+  color: var(--negro);
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
@@ -105,11 +100,11 @@ button {
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
   overflow: hidden;
-  background: var(--hueso);
+  background: var(--blanco);
 }
 
 /* ==============================================================
-   VISTAS (pantallas)
+   VISTAS (pantallas) — cada una define su propio fondo sólido
 ============================================================== */
 .view {
   position: absolute;
@@ -120,7 +115,6 @@ button {
   flex-direction: column;
   z-index: 1;
   opacity: 0;
-  background: var(--hueso);
 }
 
 .view.view--active {
@@ -145,7 +139,8 @@ button {
 }
 
 /* ==============================================================
-   MARCADOR (scoreboard) — solo Nivel 3, vive dentro de #view-juego
+   MARCADOR (scoreboard) — solo Nivel 3, vive dentro de #view-juego.
+   Sigue la pareja Naranja + Lila de esa pantalla.
 ============================================================== */
 .scoreboard {
   display: flex;
@@ -153,7 +148,7 @@ button {
   justify-content: center;
   gap: 8px;
   padding: 14px 22px 0;
-  transition: opacity 0.25s ease, max-height 0.25s ease, padding 0.25s ease;
+  transition: opacity 0.2s ease, max-height 0.2s ease, padding 0.2s ease;
   max-height: 60px;
   overflow: hidden;
 }
@@ -168,7 +163,7 @@ button {
   display: flex;
   align-items: baseline;
   gap: 7px;
-  background: var(--lila-suave);
+  background: var(--blanco);
   padding: 7px 16px;
   border-radius: var(--radius-pill);
 }
@@ -176,7 +171,7 @@ button {
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--lila-oscuro);
+  color: var(--negro);
 }
 .score-value {
   font-size: 16px;
@@ -193,13 +188,12 @@ button {
   100% { transform: scale(1); }
 }
 .score-divider {
-  color: var(--tinta-suave);
-  opacity: 0.4;
+  color: var(--negro);
   font-size: 13px;
 }
 
 /* ==============================================================
-   PORTADA — pareja Lila + Amarillo claro
+   PORTADA — fondo Amarillo, acento Lila
 ============================================================== */
 #view-portada {
   align-items: center;
@@ -207,8 +201,8 @@ button {
   text-align: center;
   padding: 40px 32px;
   background: var(--amarillo);
-  --acento: var(--lila-oscuro);
-  --acento-oscuro: #6E5D89;
+  --acento: var(--lila);
+  --acento-texto: var(--negro);
 }
 
 .portada-content {
@@ -217,17 +211,19 @@ button {
   align-items: center;
   gap: 0;
   width: 100%;
-  position: relative;
-  z-index: 1;
 }
 
 .portada-eyebrow {
+  display: inline-block;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--lila-oscuro);
-  margin-bottom: 18px;
+  color: var(--negro);
+  background: var(--lila);
+  padding: 7px 16px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 20px;
 }
 
 .portada-title {
@@ -237,13 +233,13 @@ button {
   line-height: 1;
   letter-spacing: 0.02em;
   margin: 0;
-  color: var(--tinta);
+  color: var(--negro);
 }
 
 .portada-subtitle {
   font-size: 16px;
   font-weight: 500;
-  color: var(--tinta-suave);
+  color: var(--negro);
   max-width: 280px;
   margin: 18px 0 36px;
   line-height: 1.5;
@@ -260,24 +256,24 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--papel);
+  background: var(--blanco);
   padding: 10px 20px;
   border-radius: var(--radius-pill);
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.03em;
-  box-shadow: var(--shadow-soft);
+  color: var(--negro);
 }
 .player-dot {
   width: 7px; height: 7px;
   border-radius: 50%;
 }
-.player-chip--a .player-dot { background: var(--tinta); }
-.player-chip--b .player-dot { background: var(--lila-oscuro); }
+.player-chip--a .player-dot { background: var(--negro); }
+.player-chip--b .player-dot { background: var(--lila); }
 
 .portada-players-and {
   font-weight: 600;
-  color: var(--tinta-suave);
+  color: var(--negro);
   font-size: 15px;
 }
 
@@ -285,8 +281,7 @@ button {
   margin-top: 22px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--lila-oscuro);
-  opacity: 0.8;
+  color: var(--negro);
 }
 
 /* ==============================================================
@@ -298,7 +293,7 @@ button {
   font-weight: 700;
   font-family: var(--font);
   border-radius: var(--radius-pill);
-  transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+  transition: transform 0.15s ease, opacity 0.15s ease;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -320,31 +315,24 @@ button {
 }
 
 .btn--primary {
-  background: var(--acento, var(--naranja));
-  color: var(--papel);
-}
-.btn--primary:active:not(:disabled) {
-  background: var(--acento-oscuro, var(--naranja-oscuro));
+  background: var(--acento);
+  color: var(--acento-texto);
 }
 
 .btn--ghost {
-  background: var(--papel);
-  color: var(--tinta);
+  background: var(--blanco);
+  color: var(--negro);
   padding: 14px 18px;
   font-size: 14px;
-  border: 1px solid var(--borde);
+  border: 1.5px solid var(--negro);
 }
 .btn--ghost:active {
-  background: var(--hueso);
-}
-
-.btn--danger {
-  color: var(--naranja-oscuro);
+  transform: scale(0.97);
 }
 
 .btn--text {
   background: transparent;
-  color: var(--tinta-suave);
+  color: var(--negro);
   padding: 12px;
   font-size: 14px;
   font-weight: 600;
@@ -355,27 +343,32 @@ button {
 .icon-btn {
   width: 36px; height: 36px;
   border-radius: 50%;
-  border: 1px solid var(--borde);
-  background: var(--papel);
-  color: var(--tinta-suave);
+  border: 1.5px solid var(--negro);
+  background: var(--blanco);
+  color: var(--negro);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s ease;
   flex-shrink: 0;
 }
 .icon-btn:active {
-  background: var(--hueso);
+  transform: scale(0.9);
 }
 
 /* ==============================================================
-   PANTALLA DE JUEGO — pareja Rosa + Naranja (Naranja + Lila en Nivel 3)
+   PANTALLA DE JUEGO — fondo Rosa, acento Naranja
+   (Nivel 3: fondo Lila, acento Naranja — ver override más abajo)
 ============================================================== */
 #view-juego {
   padding: 10px 22px 24px;
   justify-content: space-between;
-  background: var(--hueso);
+  background: var(--rosa);
+  --acento: var(--naranja);
+  --acento-texto: var(--blanco);
+}
+[data-nivel="3"] #view-juego {
+  background: var(--lila);
 }
 
 .game-topbar {
@@ -393,17 +386,16 @@ button {
   align-items: baseline;
   gap: 7px;
   min-width: 0;
-  background: var(--papel);
+  background: var(--blanco);
   padding: 8px 16px;
   border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-soft);
 }
 .level-indicator-label {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: var(--tinta-suave);
+  color: var(--negro);
   flex-shrink: 0;
 }
 .level-indicator-number {
@@ -413,14 +405,14 @@ button {
   flex-shrink: 0;
 }
 .level-indicator-separator {
-  color: var(--borde);
+  color: var(--negro);
   font-size: 13px;
   flex-shrink: 0;
 }
 .level-indicator-category {
   font-size: 13px;
   font-weight: 600;
-  color: var(--tinta-suave);
+  color: var(--negro);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -439,9 +431,8 @@ button {
 
 .question-card {
   width: 100%;
-  background: var(--papel);
+  background: var(--blanco);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
   padding: 44px 30px 36px;
   display: flex;
   flex-direction: column;
@@ -461,7 +452,9 @@ button {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* --- Indicador de turno: solo texto, sin ningún elemento gráfico --- */
+/* --- Indicador de turno: única indicación de la dinámica de la
+   pregunta (responde X / respondéis los dos a la vez). Siempre en
+   Naranja + Blanco, el acento común a Nivel 1-2 y Nivel 3. --- */
 .turn-indicator {
   display: flex;
   align-items: center;
@@ -471,38 +464,19 @@ button {
 .turn-text {
   font-size: 13px;
   font-weight: 800;
-  color: var(--naranja);
+  color: var(--blanco);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: var(--rosa-suave);
+  background: var(--naranja);
   padding: 8px 18px;
   border-radius: var(--radius-pill);
-}
-[data-nivel="3"] .turn-text {
-  background: var(--lila-suave);
-  color: var(--naranja);
-}
-
-.question-category-tag {
-  display: none;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.03em;
-  color: var(--lila-oscuro);
-  background: var(--lila-suave);
-  padding: 7px 16px;
-  border-radius: var(--radius-pill);
-  margin: -10px 0 0;
-}
-.question-category-tag.is-visible {
-  display: inline-block;
 }
 
 .question-text {
   font-weight: 600;
   font-size: 24px;
   line-height: 1.4;
-  color: var(--tinta);
+  color: var(--negro);
   margin: 0;
   max-width: 38ch;
   letter-spacing: -0.01em;
@@ -513,7 +487,7 @@ button {
   width: 100%;
   margin-top: 4px;
   padding-top: 24px;
-  border-top: 1px solid var(--borde);
+  border-top: 1.5px solid var(--negro);
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -523,7 +497,7 @@ button {
 .rating-label {
   font-size: 13px;
   font-weight: 700;
-  color: var(--tinta-suave);
+  color: var(--negro);
   margin: 0;
   line-height: 1.4;
 }
@@ -539,19 +513,21 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  background: var(--hueso);
-  border: 1.5px solid var(--borde);
+  background: var(--blanco);
+  border: 1.5px solid var(--negro);
   border-radius: var(--radius-md);
   padding: 16px 8px;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
 }
 .rating-btn:active {
   transform: scale(0.97);
 }
 .rating-btn.is-selected {
-  background: var(--rosa-suave);
+  background: var(--naranja);
   border-color: var(--naranja);
+}
+.rating-btn.is-selected .rating-text {
+  color: var(--blanco);
 }
 .rating-emoji {
   font-size: 24px;
@@ -560,7 +536,7 @@ button {
 .rating-text {
   font-size: 12px;
   font-weight: 700;
-  color: var(--tinta);
+  color: var(--negro);
   line-height: 1.3;
 }
 
@@ -584,7 +560,7 @@ button {
 }
 
 /* ==============================================================
-   CARTA ESPECIAL — Naranja sólido, un único color de impacto
+   CARTA ESPECIAL — fondo Naranja sólido, color único de impacto
 ============================================================== */
 #view-carta {
   background: var(--naranja);
@@ -606,32 +582,31 @@ button {
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.12em;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--blanco);
   margin: 0;
 }
 .special-card-for {
   font-size: 32px;
   font-weight: 800;
   letter-spacing: 0.01em;
-  color: var(--papel);
+  color: var(--blanco);
   margin: 0;
 }
 .special-card-text {
   font-size: 16px;
   font-weight: 500;
   line-height: 1.5;
-  color: var(--papel);
-  opacity: 0.92;
+  color: var(--blanco);
   max-width: 30ch;
   margin: 0;
 }
 #view-carta .btn--primary {
-  background: var(--papel);
+  background: var(--blanco);
   color: var(--naranja);
 }
 
 /* ==============================================================
-   PANTALLAS DE FIN (nivel / partida) — pareja Lila + Amarillo claro
+   PANTALLAS DE FIN (nivel / partida) — fondo Amarillo, acento Lila
 ============================================================== */
 #view-fin-nivel, #view-final {
   align-items: center;
@@ -640,8 +615,8 @@ button {
   padding: 40px 32px;
   gap: 18px;
   background: var(--amarillo);
-  --acento: var(--lila-oscuro);
-  --acento-oscuro: #6E5D89;
+  --acento: var(--lila);
+  --acento-texto: var(--negro);
 }
 
 .end-content {
@@ -655,16 +630,13 @@ button {
 .end-icon {
   width: 52px; height: 52px;
   border-radius: 50%;
-  background: var(--acento, var(--naranja));
-  color: var(--papel);
+  background: var(--lila);
+  color: var(--negro);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 22px;
   margin-bottom: 2px;
-}
-.end-icon--heart {
-  background: var(--lila-oscuro);
 }
 
 .end-title {
@@ -672,13 +644,13 @@ button {
   font-weight: 800;
   letter-spacing: -0.01em;
   margin: 0;
-  color: var(--tinta);
+  color: var(--negro);
 }
 
 .end-subtitle {
   font-size: 14px;
   font-weight: 500;
-  color: var(--tinta-suave);
+  color: var(--negro);
   max-width: 30ch;
   line-height: 1.5;
   margin: 0 0 14px;
@@ -690,7 +662,7 @@ button {
 
 .final-scores {
   width: 100%;
-  background: var(--papel);
+  background: var(--blanco);
   border-radius: var(--radius-md);
   padding: 18px 20px;
   display: flex;
@@ -706,20 +678,23 @@ button {
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.02em;
+  color: var(--negro);
 }
 .final-score-row strong {
-  color: var(--acento, var(--naranja));
+  color: var(--negro);
   font-size: 20px;
   font-weight: 800;
 }
 
 /* ==============================================================
    MODAL / MENÚ
+   El velo oscuro tras la hoja es funcional (indica modalidad), no
+   decorativo: usa negro con opacidad reducida, no un color de marca.
 ============================================================== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(28, 23, 18, 0.4);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -735,7 +710,7 @@ button {
 .modal-sheet {
   width: 100%;
   max-width: 560px;
-  background: var(--papel);
+  background: var(--blanco);
   border-radius: 24px 24px 0 0;
   padding: 24px 22px calc(24px + env(safe-area-inset-bottom));
   display: flex;
@@ -752,7 +727,7 @@ button {
   text-align: center;
   font-weight: 700;
   font-size: 14px;
-  color: var(--tinta-suave);
+  color: var(--negro);
   margin: 4px 0 10px;
 }
 

@@ -105,21 +105,27 @@ las categorías sin tocar ni una sola pregunta.
 
 ## Identidad visual
 
-Paleta de marca (colores planos, sin degradados en ningún sitio):
+Paleta de marca — únicamente estos colores en toda la aplicación, sin
+degradados, sin transparencias decorativas y sin sombras:
 
 | Color           | Hex       |
 |-----------------|-----------|
 | Naranja         | `#EB4213` |
 | Rosa            | `#FF99DC` |
-| Lila            | `#BCACCE` |
+| Lila            | `#E3D4F4` |
 | Amarillo claro  | `#FFFDB4` |
 
-Cada pantalla usa una única pareja dominante para mantener coherencia:
+Más blanco (`#FFFFFF`) y negro (`#000000`) como únicos neutros, para
+texto y superficies "papel" (tarjetas, chips).
 
-- **Portada y pantallas de fin** → Lila + Amarillo claro
-- **Pantalla de juego (Niveles 1 y 2)** → Rosa + Naranja
-- **Nivel 3** → Naranja + Lila
-- **Carta especial** → Naranja sólido
+Cada pantalla usa el fondo sólido de un color de marca + un único
+color de marca como acento — nunca los cuatro a la vez, y nunca las
+combinaciones Rosa+Lila o Naranja+Amarillo:
+
+- **Portada y pantallas de fin** → fondo Amarillo, acento Lila
+- **Pantalla de juego (Niveles 1 y 2)** → fondo Rosa, acento Naranja
+- **Pantalla de juego (Nivel 3)** → fondo Lila, acento Naranja
+- **Carta especial** → fondo Naranja sólido (color único, sin pareja)
 
 Tipografía: **Plus Jakarta Sans** (sans-serif) en toda la aplicación, sin
 ninguna fuente con serifa.
