@@ -140,6 +140,7 @@ button {
 
 .view.view--active {
   display: flex;
+  opacity: 1;
 }
 
 .view.view--entering {
