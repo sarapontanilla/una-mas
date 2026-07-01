@@ -113,14 +113,22 @@ degradados, sin transparencias decorativas y sin sombras:
 | Naranja         | `#EB4213` |
 | Rosa            | `#FF99DC` |
 | Lila            | `#E3D4F4` |
-| Amarillo claro  | `#FFFDB4` |
+| Amarillo claro  | `#FFFED2` |
 
-Más blanco (`#FFFFFF`) y negro (`#000000`) como únicos neutros, para
-texto y superficies "papel" (tarjetas, chips).
+Más blanco (`#FFFFFF`) y negro (`#000000`) como únicos neutros. Estos
+seis son los ÚNICOS colores que aparecen en toda la aplicación: sin
+tonos derivados, sin variaciones más claras/oscuras, sin transparencias
+decorativas ni colores de apoyo adicionales.
 
-Cada pantalla usa el fondo sólido de un color de marca + un único
-color de marca como acento — nunca los cuatro a la vez, y nunca las
-combinaciones Rosa+Lila o Naranja+Amarillo:
+Cada pantalla usa como máximo dos colores de marca a la vez (además de
+blanco/negro para texto), siguiendo siempre una de estas combinaciones:
+
+- Naranja + Rosa (principal)
+- Lila + Amarillo (principal)
+- Naranja + Lila (opcional)
+- Rosa + Amarillo (opcional)
+
+Nunca se mezclan tres o más colores de marca en la misma pantalla:
 
 - **Portada y pantallas de fin** → fondo Amarillo, acento Lila
 - **Pantalla de juego (Niveles 1 y 2)** → fondo Rosa, acento Naranja

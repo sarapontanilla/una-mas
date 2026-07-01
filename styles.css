@@ -5,7 +5,7 @@
      · Naranja  #EB4213
      · Rosa     #FF99DC
      · Lila     #E3D4F4
-     · Amarillo #FFFDB4
+     · Amarillo #FFFED2
      · Blanco y negro (solo como neutros: texto y superficies "papel")
 
    No se usa ningún otro color de apoyo (nada de crema, beige, arena,
@@ -30,7 +30,7 @@
   --naranja:   #EB4213;
   --rosa:      #FF99DC;
   --lila:      #E3D4F4;
-  --amarillo:  #FFFDB4;
+  --amarillo:  #FFFED2;
 
   /* --- Neutros: únicamente blanco y negro --- */
   --negro:     #000000;
