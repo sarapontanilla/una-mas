@@ -321,7 +321,7 @@ button {
   color: var(--negro);
   padding: 14px 18px;
   font-size: 14px;
-  border: 1.5px solid var(--negro);
+  border: 1px solid var(--negro);
 }
 .btn--ghost:active {
   transform: scale(0.97);
@@ -340,7 +340,7 @@ button {
 .icon-btn {
   width: 36px; height: 36px;
   border-radius: 50%;
-  border: 1.5px solid var(--negro);
+  border: 1px solid var(--negro);
   background: var(--blanco);
   color: var(--negro);
   display: flex;
@@ -447,7 +447,11 @@ button {
 
 /* --- Indicador de turno: única indicación de la dinámica de la
    pregunta (responde X / respondéis los dos a la vez). Etiqueta con
-   fondo Lila y texto Naranja, sin bordes ni sombras. --- */
+   fondo Lila claro y translúcido y texto Naranja, sin bordes ni
+   sombras. Esta es la ÚNICA excepción de toda la interfaz donde se
+   permite una variación (translucidez) del color base; en el resto
+   de componentes se usan exclusivamente los colores planos de la
+   paleta original. --- */
 .turn-indicator {
   display: flex;
   align-items: center;
@@ -460,7 +464,7 @@ button {
   color: var(--naranja);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  background: var(--lila);
+  background: rgba(227, 212, 244, 0.55); /* lila (#E3D4F4) más claro y translúcido — excepción única */
   padding: 8px 18px;
   border-radius: var(--radius-pill);
 }
